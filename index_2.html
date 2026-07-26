@@ -1,0 +1,2360 @@
+<!DOCTYPE html>
+<html lang="fr" id="htmlRoot">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bidayatou Al-Qari · بداية القارئ</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=Cairo:wght@300;400;600;700&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import { getFirestore, doc, getDoc, setDoc, deleteDoc, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyDmQHauLAUMF1HavKc-m0ZWfxRTXbDXspQ",
+    authDomain: "bidayatou-alqari-academie.firebaseapp.com",
+    projectId: "bidayatou-alqari-academie",
+    storageBucket: "bidayatou-alqari-academie.firebasestorage.app",
+    messagingSenderId: "663299976748",
+    appId: "1:663299976748:web:2623a90649c2ecf253ab89"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+  window._db = db;
+  window._fs = { doc, getDoc, setDoc, deleteDoc, collection, getDocs };
+</script>
+<style>
+:root {
+  --navy: #1e3a8f;
+  --navy-dark: #14265e;
+  --navy-light: #3b5bc4;
+  --gold: #c9973a;
+  --gold-light: #e5b95c;
+  --bg: #f2f3f7;
+  --card: #ffffff;
+  --text: #1a1f36;
+  --muted: #6b7280;
+  --border: #e3e6ee;
+  --green: #16a34a;
+  --red: #dc2626;
+  --radius: 12px;
+  --shadow: 0 2px 14px rgba(20, 38, 94, 0.08);
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body {
+  font-family: 'DM Sans', 'Cairo', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+}
+html[dir="rtl"] body { font-family: 'Cairo', 'DM Sans', sans-serif; }
+
+/* ===== NAVBAR ===== */
+.navbar {
+  background: linear-gradient(135deg, var(--navy-dark) 0%, var(--navy) 100%);
+  color: #fff;
+  padding: 0 24px;
+  height: 64px;
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  position: sticky;
+  top: 0;
+  z-index: 200;
+  box-shadow: 0 2px 20px rgba(20,38,94,0.35);
+}
+.nav-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 700;
+  font-size: 17px;
+  white-space: nowrap;
+  cursor: pointer;
+}
+.nav-brand .crest {
+  width: 38px; height: 38px;
+  background: #fff;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Amiri', serif;
+  color: var(--navy);
+  font-size: 20px;
+  font-weight: 700;
+  border: 2px solid var(--gold);
+}
+.nav-links {
+  display: flex;
+  gap: 4px;
+  flex: 1;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.nav-links::-webkit-scrollbar { display: none; }
+.nav-link {
+  padding: 8px 14px;
+  border-radius: 8px;
+  font-size: 13.5px;
+  font-weight: 500;
+  color: rgba(255,255,255,0.75);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.2s;
+  border: none;
+  background: none;
+  font-family: inherit;
+}
+.nav-link:hover { background: rgba(255,255,255,0.1); color: #fff; }
+.nav-link.active { background: var(--gold); color: var(--navy-dark); font-weight: 700; }
+.lang-toggle {
+  background: rgba(255,255,255,0.12);
+  border: 1px solid rgba(255,255,255,0.25);
+  color: #fff;
+  border-radius: 20px;
+  padding: 6px 16px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+.lang-toggle:hover { background: var(--gold); color: var(--navy-dark); border-color: var(--gold); }
+
+/* ===== LAYOUT ===== */
+.page { display: none; max-width: 1280px; margin: 0 auto; padding: 28px 24px 60px; }
+.page.active { display: block; }
+.page-title {
+  font-size: 26px;
+  font-weight: 700;
+  color: var(--navy-dark);
+  margin-bottom: 4px;
+  display: flex; align-items: center; gap: 10px;
+}
+.page-subtitle { color: var(--muted); font-size: 14px; margin-bottom: 26px; }
+
+/* ===== HERO (home) ===== */
+.hero {
+  text-align: center;
+  padding: 40px 20px 30px;
+}
+.hero-crest {
+  width: 110px; height: 110px;
+  margin: 0 auto 18px;
+  background: #fff;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Amiri', serif;
+  font-size: 52px;
+  color: var(--navy);
+  border: 3px solid var(--gold);
+  box-shadow: var(--shadow);
+}
+.hero h1 {
+  font-family: 'Amiri', serif;
+  font-size: 40px;
+  color: var(--navy-dark);
+  margin-bottom: 6px;
+}
+.hero .fr-name {
+  font-size: 18px;
+  color: var(--gold);
+  font-weight: 600;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  margin-bottom: 12px;
+}
+.hero p { color: var(--muted); max-width: 520px; margin: 0 auto 30px; line-height: 1.7; }
+.home-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 16px;
+  max-width: 950px;
+  margin: 0 auto;
+}
+.home-card {
+  background: var(--card);
+  border-radius: var(--radius);
+  padding: 26px 18px;
+  text-align: center;
+  cursor: pointer;
+  border: 1px solid var(--border);
+  transition: all 0.22s;
+  box-shadow: var(--shadow);
+}
+.home-card:hover { transform: translateY(-4px); border-color: var(--gold); box-shadow: 0 8px 24px rgba(20,38,94,0.14); }
+.home-card .hc-icon { font-size: 34px; margin-bottom: 10px; }
+.home-card .hc-title { font-weight: 700; color: var(--navy-dark); font-size: 15px; margin-bottom: 5px; }
+.home-card .hc-desc { font-size: 12px; color: var(--muted); line-height: 1.5; }
+.home-card.locked .hc-title::after { content: " 🔒"; font-size: 12px; }
+
+/* ===== TABLES ===== */
+.table-wrap {
+  background: var(--card);
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  overflow-x: auto;
+  box-shadow: var(--shadow);
+}
+table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+th {
+  background: var(--navy);
+  color: #fff;
+  padding: 11px 14px;
+  font-weight: 600;
+  text-align: start;
+  white-space: nowrap;
+  font-size: 12.5px;
+}
+th:first-child { border-start-start-radius: var(--radius); }
+td { padding: 10px 14px; border-bottom: 1px solid var(--border); vertical-align: middle; }
+tr:last-child td { border-bottom: none; }
+tr:hover td { background: #f8f9fc; }
+.badge {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-size: 11.5px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.badge-navy { background: #e3e9fb; color: var(--navy); }
+.badge-gold { background: #f7ecd4; color: #8a6420; }
+.badge-green { background: #dcfce7; color: #166534; }
+.badge-red { background: #fee2e2; color: #991b1b; }
+.badge-gray { background: #f1f2f6; color: var(--muted); }
+
+/* ===== SCHEDULE GRID ===== */
+.sched-controls { display: flex; gap: 10px; margin-bottom: 18px; flex-wrap: wrap; align-items: center; }
+.sched-grid {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+}
+.day-col {
+  background: var(--card);
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  overflow: hidden;
+  box-shadow: var(--shadow);
+}
+.day-head {
+  background: linear-gradient(135deg, var(--navy), var(--navy-light));
+  color: #fff;
+  text-align: center;
+  padding: 10px;
+  font-weight: 700;
+  font-size: 15px;
+}
+.slot {
+  padding: 11px 14px;
+  border-bottom: 1px solid var(--border);
+}
+.slot:last-child { border-bottom: none; }
+.slot-time { font-size: 11.5px; color: var(--gold); font-weight: 700; margin-bottom: 3px; display:flex; gap:8px; flex-wrap:wrap; }
+.slot-time .tz { color: var(--muted); font-weight: 500; }
+.slot-subject { font-weight: 600; font-size: 13.5px; color: var(--navy-dark); }
+.slot-teacher { font-size: 12px; color: var(--muted); margin-top: 2px; }
+
+/* ===== CARDS grid (teachers) ===== */
+.cards-grid { display: grid; gap: 16px; grid-template-columns: repeat(auto-fill, minmax(270px, 1fr)); }
+.t-card {
+  background: var(--card);
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  padding: 20px;
+  box-shadow: var(--shadow);
+  transition: all 0.2s;
+}
+.t-card:hover { border-color: var(--gold); }
+.t-card .t-head { display: flex; gap: 12px; align-items: center; margin-bottom: 12px; }
+.t-avatar {
+  width: 46px; height: 46px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--navy), var(--navy-light));
+  color: #fff;
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 700; font-size: 18px;
+  flex-shrink: 0;
+}
+.t-name { font-weight: 700; font-size: 15px; color: var(--navy-dark); }
+.t-loc { font-size: 12px; color: var(--muted); }
+.t-row { font-size: 13px; margin-top: 6px; display: flex; gap: 8px; align-items: baseline; flex-wrap: wrap; }
+.t-row .lbl { color: var(--muted); font-size: 11.5px; min-width: 60px; }
+
+/* ===== FORMS / INPUTS ===== */
+.input, select.input, textarea.input {
+  width: 100%;
+  padding: 10px 14px;
+  border: 1px solid var(--border);
+  border-radius: 9px;
+  font-size: 14px;
+  font-family: inherit;
+  outline: none;
+  background: #fff;
+  color: var(--text);
+  transition: border 0.2s;
+}
+.input:focus { border-color: var(--navy-light); }
+textarea.input { resize: vertical; min-height: 70px; }
+.btn {
+  padding: 10px 20px;
+  border-radius: 9px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  font-family: inherit;
+  transition: all 0.15s;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+}
+.btn:disabled { opacity: 0.5; cursor: not-allowed; }
+.btn-primary { background: linear-gradient(135deg, var(--navy), var(--navy-light)); color: #fff; }
+.btn-primary:hover:not(:disabled) { opacity: 0.9; transform: translateY(-1px); }
+.btn-gold { background: linear-gradient(135deg, var(--gold), var(--gold-light)); color: var(--navy-dark); }
+.btn-gold:hover:not(:disabled) { opacity: 0.9; }
+.btn-danger { background: #fee2e2; color: #991b1b; }
+.btn-danger:hover:not(:disabled) { background: #fecaca; }
+.btn-ghost { background: #eef0f6; color: var(--text); }
+.btn-ghost:hover:not(:disabled) { background: #e3e6ee; }
+.btn-sm { padding: 6px 12px; font-size: 12.5px; border-radius: 7px; }
+
+/* ===== LOGIN GATE ===== */
+.gate {
+  max-width: 420px;
+  margin: 60px auto;
+  background: var(--card);
+  border-radius: 16px;
+  border: 1px solid var(--border);
+  padding: 36px 32px;
+  text-align: center;
+  box-shadow: var(--shadow);
+}
+.gate .gate-icon {
+  width: 64px; height: 64px;
+  margin: 0 auto 16px;
+  background: linear-gradient(135deg, var(--navy), var(--navy-light));
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 26px;
+}
+.gate h2 { color: var(--navy-dark); font-size: 20px; margin-bottom: 6px; }
+.gate p { color: var(--muted); font-size: 13px; margin-bottom: 22px; }
+.gate .field { margin-bottom: 12px; text-align: start; }
+.gate .field label { display: block; font-size: 12px; font-weight: 600; color: var(--muted); margin-bottom: 5px; }
+.gate-error { color: var(--red); font-size: 13px; min-height: 18px; margin-top: 10px; }
+.gate-hint { font-size: 11.5px; color: var(--muted); margin-top: 14px; }
+
+/* ===== MODALS ===== */
+.overlay {
+  position: fixed; inset: 0;
+  background: rgba(15,20,45,0.55);
+  z-index: 500;
+  display: flex; align-items: flex-start; justify-content: center;
+  padding: 24px;
+  overflow-y: auto;
+  opacity: 0; pointer-events: none;
+  transition: opacity 0.22s;
+  backdrop-filter: blur(3px);
+}
+.overlay.open { opacity: 1; pointer-events: auto; }
+.modal {
+  background: var(--card);
+  border-radius: 16px;
+  width: 100%;
+  max-width: 640px;
+  margin: auto;
+  overflow: hidden;
+  transform: translateY(16px);
+  transition: transform 0.22s;
+  box-shadow: 0 24px 64px rgba(0,0,0,0.3);
+}
+.overlay.open .modal { transform: translateY(0); }
+.modal-head {
+  background: linear-gradient(135deg, var(--navy-dark), var(--navy));
+  color: #fff;
+  padding: 18px 22px;
+  display: flex; align-items: center; gap: 12px;
+}
+.modal-head h3 { font-size: 17px; flex: 1; }
+.modal-x {
+  background: rgba(255,255,255,0.12);
+  border: none; color: #fff;
+  width: 30px; height: 30px;
+  border-radius: 50%;
+  cursor: pointer; font-size: 15px;
+}
+.modal-body { padding: 22px; max-height: 72vh; overflow-y: auto; }
+.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.form-grid .full { grid-column: 1 / -1; }
+.field label { display: block; font-size: 11.5px; font-weight: 700; color: var(--muted); margin-bottom: 5px; text-transform: uppercase; letter-spacing: 0.5px; }
+.status-msg { font-size: 13px; min-height: 18px; margin-top: 10px; text-align: center; font-weight: 600; }
+
+/* ===== ADMIN ===== */
+.admin-tabs { display: flex; gap: 6px; margin-bottom: 20px; flex-wrap: wrap; }
+.admin-tab {
+  padding: 9px 16px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--card);
+  font-size: 13.5px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+  color: var(--muted);
+}
+.admin-tab.active { background: var(--navy); color: #fff; border-color: var(--navy); }
+.admin-panel { display: none; }
+.admin-panel.active { display: block; }
+.toolbar-row { display: flex; gap: 10px; margin-bottom: 16px; flex-wrap: wrap; align-items: center; }
+.settings-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 22px;
+  margin-bottom: 16px;
+  max-width: 560px;
+  box-shadow: var(--shadow);
+}
+.settings-card h4 { color: var(--navy-dark); margin-bottom: 14px; font-size: 15px; }
+.switch-row { display: flex; align-items: center; justify-content: space-between; gap: 14px; padding: 10px 0; }
+.switch {
+  position: relative; width: 46px; height: 25px;
+  background: #d3d7e3; border-radius: 20px;
+  cursor: pointer; transition: background 0.2s;
+  flex-shrink: 0;
+}
+.switch.on { background: var(--green); }
+.switch::after {
+  content: ''; position: absolute;
+  top: 3px; inset-inline-start: 3px;
+  width: 19px; height: 19px;
+  background: #fff; border-radius: 50%;
+  transition: all 0.2s;
+}
+.switch.on::after { inset-inline-start: 24px; }
+
+/* ===== ATTENDANCE / GRADES ===== */
+.att-header {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 18px;
+  margin-bottom: 18px;
+  display: flex; gap: 14px; flex-wrap: wrap; align-items: end;
+  box-shadow: var(--shadow);
+}
+.att-header .field { min-width: 200px; flex: 1; }
+.presence-toggle { display: flex; gap: 6px; }
+.pt-btn {
+  padding: 6px 14px;
+  border-radius: 20px;
+  border: 1.5px solid var(--border);
+  background: #fff;
+  font-size: 12.5px;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: inherit;
+  color: var(--muted);
+  transition: all 0.15s;
+}
+.pt-btn.present.sel { background: #dcfce7; color: #166534; border-color: #16a34a; }
+.pt-btn.absent.sel { background: #fee2e2; color: #991b1b; border-color: #dc2626; }
+.note-input {
+  width: 74px;
+  padding: 7px 10px;
+  border: 1.5px solid var(--border);
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 700;
+  text-align: center;
+  font-family: inherit;
+  outline: none;
+  color: var(--navy-dark);
+}
+.note-input:focus { border-color: var(--navy-light); }
+
+.userbar {
+  display: flex; align-items: center; gap: 10px;
+  background: #e9edfb;
+  border: 1px solid #cdd6f3;
+  border-radius: 10px;
+  padding: 9px 16px;
+  margin-bottom: 18px;
+  font-size: 13.5px;
+  flex-wrap: wrap;
+}
+.userbar b { color: var(--navy-dark); }
+
+.empty-note {
+  text-align: center;
+  padding: 44px 20px;
+  color: var(--muted);
+  background: var(--card);
+  border: 2px dashed var(--border);
+  border-radius: var(--radius);
+  font-size: 14px;
+}
+
+/* Loading */
+#loading {
+  position: fixed; inset: 0;
+  background: var(--bg);
+  z-index: 999;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center; gap: 14px;
+}
+.spinner {
+  width: 42px; height: 42px;
+  border: 3px solid #dde2f0;
+  border-top-color: var(--navy);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+.hidden { display: none !important; }
+
+@media (max-width: 640px) {
+  .navbar { padding: 0 12px; gap: 8px; }
+  .nav-brand span.brand-text { display: none; }
+  .page { padding: 18px 14px 50px; }
+  .form-grid { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+
+<div id="loading">
+  <div class="spinner"></div>
+  <span id="loadingTxt" style="color:var(--navy-dark);font-weight:600;">Chargement…</span>
+</div>
+
+<!-- NAVBAR -->
+<nav class="navbar">
+  <div class="nav-brand" onclick="go('home')">
+    <div class="crest">ب</div>
+    <span class="brand-text" data-i18n="brand">Bidayatou Al-Qari</span>
+  </div>
+  <div class="nav-links" id="navLinks">
+    <button class="nav-link" data-page="home" onclick="go('home')" data-i18n="nav_home">Accueil</button>
+    <button class="nav-link" data-page="schedule" onclick="go('schedule')" data-i18n="nav_schedule">Emploi du temps</button>
+    <button class="nav-link" data-page="teachers" onclick="go('teachers')" data-i18n="nav_teachers">Professeurs</button>
+    <button class="nav-link" data-page="students" onclick="go('students')" data-i18n="nav_students">Étudiants</button>
+    <button class="nav-link" data-page="attendance" onclick="go('attendance')" data-i18n="nav_attendance">Assiduité</button>
+    <button class="nav-link" data-page="grades" onclick="go('grades')" data-i18n="nav_grades">Évaluations</button>
+    <button class="nav-link" data-page="live" onclick="go('live')" data-i18n="nav_live">Cours en direct</button>
+    <button class="nav-link" data-page="admin" onclick="go('admin')" data-i18n="nav_admin">Administration</button>
+  </div>
+  <button class="lang-toggle" onclick="toggleLang()" id="langBtn">العربية</button>
+</nav>
+
+<!-- ============ PAGE: HOME ============ -->
+<div class="page" id="page-home">
+  <div class="hero">
+    <div class="hero-crest">ب</div>
+    <h1>بداية القارئ للدراسات الشرعية</h1>
+    <div class="fr-name">Bidayatou Al-Qari</div>
+    <p data-i18n="home_desc">Académie d'apprentissage des sciences islamiques en ligne — Programme académique du semestre 1.</p>
+    <div class="home-cards">
+      <div class="home-card" onclick="go('schedule')">
+        <div class="hc-icon">📅</div>
+        <div class="hc-title" data-i18n="nav_schedule">Emploi du temps</div>
+        <div class="hc-desc" data-i18n="home_sched_desc">Consultez les horaires des cours (Sénégal / Égypte)</div>
+      </div>
+      <div class="home-card" onclick="go('teachers')">
+        <div class="hc-icon">📖</div>
+        <div class="hc-title" data-i18n="nav_teachers">Professeurs</div>
+        <div class="hc-desc" data-i18n="home_teach_desc">L'équipe enseignante et leurs matières</div>
+      </div>
+      <div class="home-card locked" onclick="go('students')">
+        <div class="hc-icon">🪑</div>
+        <div class="hc-title" data-i18n="nav_students">Étudiants</div>
+        <div class="hc-desc" data-i18n="home_stud_desc">Liste des étudiants admis (accès protégé)</div>
+      </div>
+      <div class="home-card locked" onclick="go('attendance')">
+        <div class="hc-icon">✅</div>
+        <div class="hc-title" data-i18n="nav_attendance">Assiduité</div>
+        <div class="hc-desc" data-i18n="home_att_desc">Émargement des étudiants par cours (professeurs)</div>
+      </div>
+      <div class="home-card locked" onclick="go('grades')">
+        <div class="hc-icon">📝</div>
+        <div class="hc-title" data-i18n="nav_grades">Évaluations</div>
+        <div class="hc-desc" data-i18n="home_grades_desc">Saisie des notes par matière (professeurs)</div>
+      </div>
+      <div class="home-card" onclick="go('live')">
+        <div class="hc-icon">🎥</div>
+        <div class="hc-title" data-i18n="nav_live">Cours en direct</div>
+        <div class="hc-desc" data-i18n="home_live_desc">Salles de visioconférence intégrées, sans limite de temps</div>
+      </div>
+      <div class="home-card locked" onclick="go('admin')">
+        <div class="hc-icon">⚙️</div>
+        <div class="hc-title" data-i18n="nav_admin">Administration</div>
+        <div class="hc-desc" data-i18n="home_admin_desc">Gestion complète des données et paramètres</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ PAGE: SCHEDULE ============ -->
+<div class="page" id="page-schedule">
+  <div class="page-title">📅 <span data-i18n="sched_title">Emploi du temps — Semestre 1</span></div>
+  <div class="page-subtitle" data-i18n="sched_sub">مشروع بداية القارئ - الفصل الدراسي ١</div>
+  <div class="sched-controls">
+    <select class="input" id="schedTeacherFilter" style="max-width:280px;" onchange="renderSchedule()"></select>
+    <select class="input" id="schedSubjectFilter" style="max-width:240px;" onchange="renderSchedule()"></select>
+  </div>
+  <div class="sched-grid" id="schedGrid"></div>
+</div>
+
+<!-- ============ PAGE: TEACHERS ============ -->
+<div class="page" id="page-teachers">
+  <div class="page-title">📖 <span data-i18n="teach_title">Nos professeurs</span></div>
+  <div class="page-subtitle" data-i18n="teach_sub">L'équipe enseignante du programme</div>
+  <div class="cards-grid" id="teachersGrid"></div>
+</div>
+
+<!-- ============ PAGE: STUDENTS (protected) ============ -->
+<div class="page" id="page-students">
+  <div id="studentsGate" class="gate">
+    <div class="gate-icon">🔒</div>
+    <h2 data-i18n="stud_gate_title">Accès protégé</h2>
+    <p data-i18n="stud_gate_desc">Cette page est réservée. Veuillez saisir le mot de passe.</p>
+    <div class="field">
+      <input type="password" class="input" id="studentsPw" data-i18n-ph="pw_placeholder" placeholder="Mot de passe">
+    </div>
+    <button class="btn btn-primary" style="width:100%;" onclick="unlockStudents()" data-i18n="btn_enter">Entrer</button>
+    <div class="gate-error" id="studentsGateErr"></div>
+  </div>
+  <div id="studentsContent" class="hidden">
+    <div class="page-title">🪑 <span data-i18n="stud_title">Liste des étudiants admis</span></div>
+    <div class="page-subtitle"><span id="studCount"></span></div>
+    <div class="toolbar-row">
+      <input class="input" id="studSearch" style="max-width:300px;" data-i18n-ph="search_student" placeholder="Rechercher…" oninput="renderStudents()">
+      <select class="input" id="studGroupFilter" style="max-width:200px;" onchange="renderStudents()"></select>
+    </div>
+    <div class="table-wrap">
+      <table id="studentsTable"></table>
+    </div>
+  </div>
+</div>
+
+<!-- ============ PAGE: ATTENDANCE (teachers) ============ -->
+<div class="page" id="page-attendance">
+  <div id="attGate" class="gate">
+    <div class="gate-icon">✅</div>
+    <h2 data-i18n="att_gate_title">Espace professeurs — Assiduité</h2>
+    <p data-i18n="att_gate_desc">Sélectionnez votre nom et saisissez le mot de passe professeur.</p>
+    <div class="field">
+      <label data-i18n="lbl_teacher">Professeur</label>
+      <select class="input" id="attTeacherSel"></select>
+    </div>
+    <div class="field">
+      <label data-i18n="lbl_password">Mot de passe</label>
+      <input type="password" class="input" id="attPw" data-i18n-ph="pw_placeholder" placeholder="Mot de passe">
+    </div>
+    <button class="btn btn-primary" style="width:100%;" onclick="unlockAttendance()" data-i18n="btn_login">Se connecter</button>
+    <div class="gate-error" id="attGateErr"></div>
+  </div>
+  <div id="attContent" class="hidden">
+    <div class="userbar">
+      <span>📖</span> <span data-i18n="connected_as">Connecté :</span> <b id="attTeacherName"></b>
+      <button class="btn btn-ghost btn-sm" style="margin-inline-start:auto;" onclick="logoutAttendance()" data-i18n="btn_logout">Déconnexion</button>
+    </div>
+    <div class="page-title">✅ <span data-i18n="att_title">Suivi de l'assiduité</span></div>
+    <div class="att-header">
+      <div class="field">
+        <label data-i18n="lbl_course">Cours</label>
+        <select class="input" id="attCourseSel" onchange="loadAttendanceSheet()"></select>
+      </div>
+      <div class="field">
+        <label data-i18n="lbl_date">Date de la séance</label>
+        <input type="date" class="input" id="attDate" onchange="loadAttendanceSheet()">
+      </div>
+    </div>
+    <div id="attSheet"></div>
+  </div>
+</div>
+
+<!-- ============ PAGE: GRADES (teachers) ============ -->
+<div class="page" id="page-grades">
+  <div id="gradesGate" class="gate">
+    <div class="gate-icon">📝</div>
+    <h2 data-i18n="grades_gate_title">Espace professeurs — Évaluations</h2>
+    <p data-i18n="att_gate_desc">Sélectionnez votre nom et saisissez le mot de passe professeur.</p>
+    <div class="field">
+      <label data-i18n="lbl_teacher">Professeur</label>
+      <select class="input" id="gradesTeacherSel"></select>
+    </div>
+    <div class="field">
+      <label data-i18n="lbl_password">Mot de passe</label>
+      <input type="password" class="input" id="gradesPw" data-i18n-ph="pw_placeholder" placeholder="Mot de passe">
+    </div>
+    <button class="btn btn-primary" style="width:100%;" onclick="unlockGrades()" data-i18n="btn_login">Se connecter</button>
+    <div class="gate-error" id="gradesGateErr"></div>
+  </div>
+  <div id="gradesContent" class="hidden">
+    <div class="userbar">
+      <span>📖</span> <span data-i18n="connected_as">Connecté :</span> <b id="gradesTeacherName"></b>
+      <button class="btn btn-ghost btn-sm" style="margin-inline-start:auto;" onclick="logoutGrades()" data-i18n="btn_logout">Déconnexion</button>
+    </div>
+    <div class="page-title">📝 <span data-i18n="grades_title">Saisie des évaluations</span></div>
+    <div class="att-header">
+      <div class="field">
+        <label data-i18n="lbl_subject">Matière</label>
+        <select class="input" id="gradesSubjectSel" onchange="loadGradesSheet()"></select>
+      </div>
+      <div class="field">
+        <label data-i18n="lbl_eval_label">Intitulé de l'évaluation</label>
+        <input type="text" class="input" id="gradesLabel" data-i18n-ph="eval_label_ph" placeholder="Ex : Examen mi-semestre">
+      </div>
+      <div class="field">
+        <label data-i18n="lbl_date">Date</label>
+        <input type="date" class="input" id="gradesDate">
+      </div>
+    </div>
+    <div id="gradesSheet"></div>
+  </div>
+</div>
+
+
+<!-- ============ PAGE: LIVE (visio) ============ -->
+<div class="page" id="page-live">
+  <div id="liveList">
+    <div class="page-title">🎥 <span data-i18n="live_title">Cours en direct</span></div>
+    <div class="page-subtitle" data-i18n="live_sub">Rejoignez la salle de classe virtuelle de votre cours. Les salles sont sans limite de durée.</div>
+    <div class="settings-card" style="max-width:100%;background:#fdf6e9;border-color:#eeddba;">
+      <div style="font-size:13px;line-height:1.7;color:#7a5c1e;">
+        <b data-i18n="live_info_title">ℹ️ Fonctionnement :</b>
+        <span data-i18n="live_info_txt">La salle s'ouvre dans un nouvel onglet (gratuit et sans limite de durée). Le professeur qui ouvre la salle en premier devient modérateur (une connexion Google lui sera demandée la première fois), puis les étudiants rejoignent librement. Pour enregistrer le cours : menu ⋮ → « Démarrer l'enregistrement » → la vidéo est sauvegardée sur l'ordinateur du professeur, sans limite de durée.</span>
+      </div>
+    </div>
+    <div class="cards-grid" id="liveRoomsGrid" style="margin-top:18px;"></div>
+  </div>
+
+</div>
+
+<!-- ============ PAGE: ADMIN ============ -->
+<div class="page" id="page-admin">
+  <div id="adminGate" class="gate">
+    <div class="gate-icon">⚙️</div>
+    <h2 data-i18n="admin_gate_title">Administration</h2>
+    <p data-i18n="admin_gate_desc">Accès réservé à l'administrateur.</p>
+    <div class="field">
+      <label data-i18n="lbl_username">Identifiant</label>
+      <input type="text" class="input" id="adminUser" placeholder="admin">
+    </div>
+    <div class="field">
+      <label data-i18n="lbl_password">Mot de passe</label>
+      <input type="password" class="input" id="adminPw" data-i18n-ph="pw_placeholder" placeholder="Mot de passe">
+    </div>
+    <button class="btn btn-primary" style="width:100%;" onclick="unlockAdmin()" data-i18n="btn_login">Se connecter</button>
+    <div class="gate-error" id="adminGateErr"></div>
+    <div class="gate-hint" id="adminHint" data-i18n="admin_hint">Mot de passe oublié ? Contactez : correia.domingo@gmail.com</div>
+  </div>
+  <div id="adminContent" class="hidden">
+    <div class="userbar">
+      <span>⚙️</span> <b data-i18n="admin_connected">Administrateur connecté</b>
+      <button class="btn btn-ghost btn-sm" style="margin-inline-start:auto;" onclick="logoutAdmin()" data-i18n="btn_logout">Déconnexion</button>
+    </div>
+    <div class="page-title">⚙️ <span data-i18n="nav_admin">Administration</span></div>
+    <div class="admin-tabs">
+      <button class="admin-tab active" data-tab="students" onclick="adminTab('students')" data-i18n="nav_students">Étudiants</button>
+      <button class="admin-tab" data-tab="teachers" onclick="adminTab('teachers')" data-i18n="nav_teachers">Professeurs</button>
+      <button class="admin-tab" data-tab="schedule" onclick="adminTab('schedule')" data-i18n="nav_schedule">Emploi du temps</button>
+      <button class="admin-tab" data-tab="reports" onclick="adminTab('reports')" data-i18n="tab_reports">Rapports</button>
+      <button class="admin-tab" data-tab="import" onclick="adminTab('import')" data-i18n="tab_import">Import Excel</button>
+      <button class="admin-tab" data-tab="settings" onclick="adminTab('settings')" data-i18n="tab_settings">Paramètres</button>
+    </div>
+
+    <div class="admin-panel active" id="admin-students">
+      <div class="toolbar-row">
+        <button class="btn btn-primary btn-sm" onclick="openStudentForm(null)" data-i18n="btn_add_student">＋ Ajouter un étudiant</button>
+      </div>
+      <div class="table-wrap"><table id="adminStudentsTable"></table></div>
+    </div>
+
+    <div class="admin-panel" id="admin-teachers">
+      <div class="toolbar-row">
+        <button class="btn btn-primary btn-sm" onclick="openTeacherForm(null)" data-i18n="btn_add_teacher">＋ Ajouter un professeur</button>
+      </div>
+      <div class="table-wrap"><table id="adminTeachersTable"></table></div>
+    </div>
+
+    <div class="admin-panel" id="admin-schedule">
+      <div class="toolbar-row">
+        <button class="btn btn-primary btn-sm" onclick="openSlotForm(null)" data-i18n="btn_add_slot">＋ Ajouter un créneau</button>
+      </div>
+      <div class="table-wrap"><table id="adminScheduleTable"></table></div>
+    </div>
+
+    <div class="admin-panel" id="admin-reports">
+      <div class="settings-card">
+        <h4 data-i18n="report_att_title">📊 Rapport d'émargement</h4>
+        <p style="font-size:13px;color:var(--muted);margin-bottom:14px;" data-i18n="report_att_desc">Export Excel de toutes les feuilles de présence enregistrées, avec statistiques par étudiant.</p>
+        <button class="btn btn-gold" onclick="exportAttendanceReport()" data-i18n="btn_export_att">📥 Exporter l'émargement</button>
+      </div>
+      <div class="settings-card">
+        <h4 data-i18n="report_grades_title">📊 Rapport des évaluations</h4>
+        <p style="font-size:13px;color:var(--muted);margin-bottom:14px;" data-i18n="report_grades_desc">Export Excel de toutes les notes saisies par les professeurs, avec moyennes par étudiant et par matière.</p>
+        <button class="btn btn-gold" onclick="exportGradesReport()" data-i18n="btn_export_grades">📥 Exporter les évaluations</button>
+      </div>
+    </div>
+
+    <div class="admin-panel" id="admin-import">
+      <div class="settings-card" style="max-width:640px;">
+        <h4 data-i18n="import_title">📤 Importer un fichier Excel</h4>
+        <p style="font-size:13px;color:var(--muted);margin-bottom:16px;" data-i18n="import_desc">Sélectionnez le fichier Excel mis à jour (mêmes onglets : الفصل الدارسي ١ / الطلاب / الأساتذة). Un aperçu des changements sera affiché avant toute application.</p>
+        <input type="file" id="importFile" accept=".xlsx,.xls" class="input" style="padding:8px;" onchange="handleImportFile(event)">
+        <div id="importPreview" style="margin-top:18px;"></div>
+      </div>
+    </div>
+
+    <div class="admin-panel" id="admin-settings">
+      <div class="settings-card">
+        <h4 data-i18n="set_access_title">🔐 Accès page Étudiants</h4>
+        <div class="switch-row">
+          <span style="font-size:14px;" data-i18n="set_stud_enabled">Page étudiants activée</span>
+          <div class="switch" id="studPageSwitch" onclick="toggleStudentPage()"></div>
+        </div>
+        <div class="field" style="margin-top:10px;">
+          <label data-i18n="set_stud_pw">Mot de passe page étudiants</label>
+          <input type="text" class="input" id="setStudentPw">
+        </div>
+      </div>
+      <div class="settings-card">
+        <h4 data-i18n="set_teacher_title">🔐 Mot de passe professeurs</h4>
+        <p style="font-size:12.5px;color:var(--muted);margin-bottom:10px;" data-i18n="set_teacher_desc">Utilisé pour les pages Assiduité et Évaluations.</p>
+        <div class="field">
+          <label data-i18n="lbl_password">Mot de passe</label>
+          <input type="text" class="input" id="setTeacherPw">
+        </div>
+      </div>
+      <div class="settings-card">
+        <h4 data-i18n="set_admin_title">🔐 Compte administrateur</h4>
+        <div class="form-grid">
+          <div class="field">
+            <label data-i18n="lbl_username">Identifiant</label>
+            <input type="text" class="input" id="setAdminUser">
+          </div>
+          <div class="field">
+            <label data-i18n="lbl_password">Mot de passe</label>
+            <input type="text" class="input" id="setAdminPw">
+          </div>
+          <div class="field full">
+            <label data-i18n="set_recovery">Email de secours</label>
+            <input type="email" class="input" id="setRecoveryEmail">
+          </div>
+        </div>
+      </div>
+      <button class="btn btn-primary" onclick="saveSettings()" data-i18n="btn_save_settings">💾 Enregistrer les paramètres</button>
+      <div class="status-msg" id="settingsStatus"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ MODAL: STUDENT FORM ============ -->
+<div class="overlay" id="ovStudent">
+  <div class="modal">
+    <div class="modal-head">
+      <h3 id="studentFormTitle">Étudiant</h3>
+      <button class="modal-x" onclick="closeOv('ovStudent')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-grid">
+        <div class="field"><label data-i18n="f_prenom">Prénom (الاسم) *</label><input class="input" id="fPrenom"></div>
+        <div class="field"><label data-i18n="f_nom">Nom (اللقب) *</label><input class="input" id="fNom"></div>
+        <div class="field"><label data-i18n="f_tel">Téléphone (WhatsApp)</label><input class="input" id="fTel"></div>
+        <div class="field"><label data-i18n="f_age">Âge (العمر)</label><input class="input" id="fAge"></div>
+        <div class="field"><label data-i18n="f_arabe">Niveau arabe /5</label><input class="input" id="fArabe" type="number" min="0" max="5"></div>
+        <div class="field"><label data-i18n="f_test">Note test écrit /100</label><input class="input" id="fTest" type="number" min="0" max="100"></div>
+        <div class="field"><label data-i18n="f_apprec">Appréciation (التقدير)</label>
+          <select class="input" id="fApprec">
+            <option value="ممتاز">ممتاز (Excellent)</option>
+            <option value="جيد جدًا">جيد جدًا (Très bien)</option>
+            <option value="جيد">جيد (Bien)</option>
+            <option value="مقبول">مقبول (Passable)</option>
+          </select>
+        </div>
+        <div class="field"><label data-i18n="f_groupe">Groupe Coran (المجموعة)</label>
+          <select class="input" id="fGroupe">
+            <option value="المجموعة 1">المجموعة 1</option>
+            <option value="المجموعة 2">المجموعة 2</option>
+            <option value="المجموعة 3">المجموعة 3</option>
+            <option value="المجموعة 4">المجموعة 4</option>
+            <option value="">—</option>
+          </select>
+        </div>
+        <div class="field full"><label data-i18n="f_sourate">Dernière sourate mémorisée (آخر سورة محفوظة)</label><input class="input" id="fSourate"></div>
+        <div class="field"><label data-i18n="f_tazkiya">Tazkiya (التزكية)</label><input class="input" id="fTazkiya"></div>
+        <div class="field"><label data-i18n="f_nasab">Nasab (النسب)</label><input class="input" id="fNasab"></div>
+      </div>
+      <button class="btn btn-primary" style="width:100%;margin-top:16px;" onclick="saveStudent()" data-i18n="btn_save">💾 Enregistrer</button>
+      <div class="status-msg" id="studentFormStatus"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ MODAL: TEACHER FORM ============ -->
+<div class="overlay" id="ovTeacher">
+  <div class="modal">
+    <div class="modal-head">
+      <h3 id="teacherFormTitle">Professeur</h3>
+      <button class="modal-x" onclick="closeOv('ovTeacher')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-grid">
+        <div class="field full"><label data-i18n="f_tname">Nom complet (الأستاذ...) *</label><input class="input" id="fTName"></div>
+        <div class="field"><label data-i18n="f_tel">Téléphone (WhatsApp)</label><input class="input" id="fTTel"></div>
+        <div class="field"><label data-i18n="f_tloc">Lieu (مكان السكن)</label><input class="input" id="fTLoc"></div>
+        <div class="field full"><label data-i18n="f_tsubjects">Matières (séparées par des virgules)</label><input class="input" id="fTSubjects"></div>
+      </div>
+      <button class="btn btn-primary" style="width:100%;margin-top:16px;" onclick="saveTeacher()" data-i18n="btn_save">💾 Enregistrer</button>
+      <div class="status-msg" id="teacherFormStatus"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ MODAL: SLOT FORM ============ -->
+<div class="overlay" id="ovSlot">
+  <div class="modal">
+    <div class="modal-head">
+      <h3 id="slotFormTitle">Créneau</h3>
+      <button class="modal-x" onclick="closeOv('ovSlot')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-grid">
+        <div class="field"><label data-i18n="f_day">Jour (اليوم) *</label>
+          <select class="input" id="fDay">
+            <option value="السبت">السبت (Samedi)</option>
+            <option value="الأحد">الأحد (Dimanche)</option>
+            <option value="الاثنين">الاثنين (Lundi)</option>
+            <option value="الثلاثاء">الثلاثاء (Mardi)</option>
+            <option value="الأربعاء">الأربعاء (Mercredi)</option>
+            <option value="الخميس">الخميس (Jeudi)</option>
+            <option value="الجمعة">الجمعة (Vendredi)</option>
+          </select>
+        </div>
+        <div class="field"><label data-i18n="f_subject">Matière (المادة) *</label><input class="input" id="fSubject"></div>
+        <div class="field"><label data-i18n="f_time_sn">Horaire Sénégal 🇸🇳</label><input class="input" id="fTimeSn" placeholder="12:00 - 13:00"></div>
+        <div class="field"><label data-i18n="f_time_eg">Horaire Égypte 🇪🇬</label><input class="input" id="fTimeEg" placeholder="15:00 - 16:00"></div>
+        <div class="field full"><label data-i18n="lbl_teacher">Professeur</label>
+          <select class="input" id="fSlotTeacher"></select>
+        </div>
+      </div>
+      <button class="btn btn-primary" style="width:100%;margin-top:16px;" onclick="saveSlot()" data-i18n="btn_save">💾 Enregistrer</button>
+      <div class="status-msg" id="slotFormStatus"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ MODAL: CONFIRM DELETE ============ -->
+<div class="overlay" id="ovConfirm">
+  <div class="modal" style="max-width:400px;">
+    <div class="modal-head" style="background:linear-gradient(135deg,#7f1d1d,#b91c1c);">
+      <h3 data-i18n="confirm_title">Confirmer la suppression</h3>
+      <button class="modal-x" onclick="closeOv('ovConfirm')">✕</button>
+    </div>
+    <div class="modal-body" style="text-align:center;">
+      <p style="margin-bottom:6px;" data-i18n="confirm_msg">Voulez-vous vraiment supprimer :</p>
+      <p style="font-weight:700;font-size:16px;margin-bottom:20px;" id="confirmName">—</p>
+      <div style="display:flex;gap:10px;">
+        <button class="btn btn-ghost" style="flex:1;" onclick="closeOv('ovConfirm')" data-i18n="btn_cancel">Annuler</button>
+        <button class="btn btn-danger" style="flex:1;" id="confirmBtn" data-i18n="btn_delete">🗑️ Supprimer</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ================= SEED DATA (premier lancement) =================
+const SEED_SCHEDULE = [{"id": 1, "day": "الأربعاء", "timeSenegal": "11:30 - 12:30", "timeEgypt": "14:30 - 15:30", "subject": "القرآن - المجموعة 1", "teacher": "الأستاذ أحمد أبو عبد الله"}, {"id": 2, "day": "السبت", "timeSenegal": "12:00 - 13:00", "timeEgypt": "15:00 - 16:00", "subject": "القرآن - المجموعة 1", "teacher": "الأستاذ أحمد أبو عبد الله"}, {"id": 3, "day": "السبت", "timeSenegal": "12:00 - 13:00", "timeEgypt": "15:00 - 16:00", "subject": "القرآن - المجموعة 2", "teacher": "الأستاذ أحمد تيونغان"}, {"id": 4, "day": "الأحد", "timeSenegal": "12:00 - 13:00", "timeEgypt": "15:00 - 16:00", "subject": "القرآن - المجموعة 2", "teacher": "الأستاذ أحمد تيونغان"}, {"id": 5, "day": "الاثنين", "timeSenegal": "12:00 - 13:00", "timeEgypt": "15:00 - 16:00", "subject": "القرآن - المجموعة 1", "teacher": "الأستاذ أحمد أبو عبد الله"}, {"id": 6, "day": "الاثنين", "timeSenegal": "12:00 - 13:00", "timeEgypt": "15:00 - 16:00", "subject": "القرآن - المجموعة 2", "teacher": "الأستاذ أحمد تيونغان"}, {"id": 7, "day": "الثلاثاء", "timeSenegal": "12:00 - 13:00", "timeEgypt": "15:00 - 16:00", "subject": "القرآن - المجموعة 1", "teacher": "الأستاذ أحمد أبو عبد الله"}, {"id": 8, "day": "الثلاثاء", "timeSenegal": "12:00 - 13:00", "timeEgypt": "15:00 - 16:00", "subject": "القرآن - المجموعة 2", "teacher": "الأستاذ أحمد تيونغان"}, {"id": 9, "day": "الأربعاء", "timeSenegal": "12:00 - 13:00", "timeEgypt": "15:00 - 16:00", "subject": "القرآن - المجموعة 2", "teacher": "الأستاذ أحمد تيونغان"}, {"id": 10, "day": "الأربعاء", "timeSenegal": "12:30 - 13:30", "timeEgypt": "15:30 - 16:30", "subject": "القرآن - المجموعة 3", "teacher": "الأستاذ أحمد أبو عبد الله"}, {"id": 11, "day": "السبت", "timeSenegal": "13:00 - 14:00", "timeEgypt": "16:00 - 17:00", "subject": "الفقه الميسر", "teacher": "الأستاذ لامين جيديو"}, {"id": 12, "day": "السبت", "timeSenegal": "14:30 - 15:30", "timeEgypt": "17:30 - 18:30", "subject": "القرآن - المجموعة 3", "teacher": "الأستاذ أحمد أبو عبد الله"}, {"id": 13, "day": "السبت", "timeSenegal": "14:30 - 15:30", "timeEgypt": "17:30 - 18:30", "subject": "القرآن - المجموعة 4", "teacher": "الأستاذ أحمد تيونغان"}, {"id": 14, "day": "الأحد", "timeSenegal": "14:30 - 15:30", "timeEgypt": "17:30 - 18:30", "subject": "القرآن - المجموعة 4", "teacher": "الأستاذ أحمد تيونغان"}, {"id": 15, "day": "الاثنين", "timeSenegal": "14:30 - 15:30", "timeEgypt": "17:30 - 18:30", "subject": "القرآن - المجموعة 3", "teacher": "الأستاذ أحمد أبو عبد الله"}, {"id": 16, "day": "الاثنين", "timeSenegal": "14:30 - 15:30", "timeEgypt": "17:30 - 18:30", "subject": "القرآن - المجموعة 4", "teacher": "الأستاذ أحمد تيونغان"}, {"id": 17, "day": "الثلاثاء", "timeSenegal": "14:30 - 15:30", "timeEgypt": "17:30 - 18:30", "subject": "القرآن - المجموعة 3", "teacher": "الأستاذ أحمد أبو عبد الله"}, {"id": 18, "day": "الثلاثاء", "timeSenegal": "14:30 - 15:30", "timeEgypt": "17:30 - 18:30", "subject": "القرآن - المجموعة 4", "teacher": "الأستاذ أحمد تيونغان"}, {"id": 19, "day": "الأربعاء", "timeSenegal": "14:30 - 15:30", "timeEgypt": "17:30 - 18:30", "subject": "القرآن - المجموعة 4", "teacher": "الأستاذ أحمد تيونغان"}, {"id": 20, "day": "الاثنين", "timeSenegal": "15:30 - 16:30", "timeEgypt": "18:30 - 19:30", "subject": "التفسير وأصول التفسير", "teacher": "الأستاذ أحمد أبو عبد الله"}, {"id": 21, "day": "الثلاثاء", "timeSenegal": "15:30 - 16:30", "timeEgypt": "18:30 - 19:30", "subject": "التجويد", "teacher": "الأستاذ أحمد أبو عبد الله"}, {"id": 22, "day": "السبت", "timeSenegal": "15:45 - 16:45", "timeEgypt": "18:45 - 19:45", "subject": "الأصول الثلاثة والمنهجية", "teacher": "الأستاذ محمد عزت"}, {"id": 23, "day": "الأربعاء", "timeSenegal": "15:45 - 16:45", "timeEgypt": "18:45 - 19:45", "subject": "الأصول الثلاثة والمنهجية", "teacher": "الأستاذ محمد عزت"}, {"id": 24, "day": "الثلاثاء", "timeSenegal": "16:30 - 17:30", "timeEgypt": "19:30 - 20:30", "subject": "السلوك (حلية طالب العلم)", "teacher": "الأستاذ أحمد أبو عبد الله"}];
+const SEED_STUDENTS = [{"id": 1, "prenom": "عبد الله ألكسندر", "nom": "سار", "tel": "00221781954307", "niveauArabe": "5", "noteTest": "100", "appreciation": "ممتاز", "derniereSourate": "التوبة ← الناس", "tazkiya": "عبد الله با", "nasab": "عبد الله ألكسندر بن ندان سار", "age": "32 سنة", "groupe": "المجموعة 1"}, {"id": 2, "prenom": "عبد الله", "nom": "جالو", "tel": "00221782890421 / 00221776042765", "niveauArabe": "5", "noteTest": "100", "appreciation": "جيد جدًا", "derniereSourate": "النساء ← الناس / الجزء 1 البقرة", "tazkiya": "إسماعيل تراوري", "nasab": "عبد الله بن خالد جالو", "age": "29 سنة", "groupe": "المجموعة 2"}, {"id": 3, "prenom": "كرموخو محمد", "nom": "سَمَتِ", "tel": "00221772699444", "niveauArabe": "5", "noteTest": "100", "appreciation": "جيد جدًا", "derniereSourate": "الكهف ← الناس (عدا سبأ وفاطر) / البقرة، الإسراء", "tazkiya": "أحمد تيونغان", "nasab": "كرامخو محمد بن مَسِي سَمَتِ", "age": "35 سنة", "groupe": "المجموعة 1"}, {"id": 4, "prenom": "محمد", "nom": "جالو", "tel": "00221777061972", "niveauArabe": "5", "noteTest": "95", "appreciation": "جيد جدًا", "derniereSourate": "الملك ← الناس", "tazkiya": "أحمد تيونغان", "nasab": "محمد بن محمد جان جالو", "age": "27 سنة", "groupe": "المجموعة 2"}, {"id": 5, "prenom": "ألفا عمر", "nom": "جالو", "tel": "00221773893535", "niveauArabe": "5", "noteTest": "90", "appreciation": "جيد جدًا", "derniereSourate": "حافظ لكنه يراجع ما نسيه", "tazkiya": "أحمد ديينغ", "nasab": "ألفا عمر بن محمد جالو", "age": "33 سنة", "groupe": "المجموعة 3"}, {"id": 6, "prenom": "الأمين", "nom": "جالو", "tel": "00221779163773", "niveauArabe": "5", "noteTest": "90", "appreciation": "جيد", "derniereSourate": "النصف الثاني من القرآن عدا 4 سور", "tazkiya": "أحمد ديينغ", "nasab": "محمد الأمين بن محمد جالو", "age": "41 سنة", "groupe": "المجموعة 3"}, {"id": 7, "prenom": "سيدنا عمر", "nom": "ساكو", "tel": "00221774809918", "niveauArabe": "4", "noteTest": "100", "appreciation": "جيد جدًا", "derniereSourate": "حافظ لكنه يراجع ما نسيه", "tazkiya": "موسى سار", "nasab": "عمر بن دودو ساكو", "age": "26 سنة", "groupe": "المجموعة 2"}, {"id": 8, "prenom": "علياقي عمر", "nom": "واتارا", "tel": "00225161190309", "niveauArabe": "4", "noteTest": "85", "appreciation": "جيد جدًا", "derniereSourate": "الأحقاف ← الناس // الكهف ← الحج", "tazkiya": "موسى لوف", "nasab": "عمر بن علي وتارا", "age": "30 سنة", "groupe": "المجموعة 4"}, {"id": 9, "prenom": "محمد", "nom": "قاسم", "tel": "00221779465065", "niveauArabe": "4", "noteTest": "75", "appreciation": "مقبول", "derniereSourate": "المجادلة ← الناس", "tazkiya": "أحمد تيونغان", "nasab": "محمد قاسم بن عبد الرحمن باه", "age": "25 سنة", "groupe": "المجموعة 3"}, {"id": 10, "prenom": "عبد القادر", "nom": "كمغتى", "tel": "00225150028077", "niveauArabe": "3", "noteTest": "90", "appreciation": "جيد", "derniereSourate": "البقرة (1 ← 232) / يوسف ← الحج / الملك ← الناس (عدا القلم، الجن، المرسلات)", "tazkiya": "موسى لوف", "nasab": "عبد القادر بن عثمان كمغتى", "age": "25 سنة", "groupe": "المجموعة 4"}, {"id": 11, "prenom": "فاي", "nom": "إبراهيم", "tel": "00221779502621", "niveauArabe": "3", "noteTest": "85", "appreciation": "جيد", "derniereSourate": "ق ← الناس", "tazkiya": "عبد الله با", "nasab": "إبراهيم بن إدريس فاي", "age": "28 سنة", "groupe": "المجموعة 3"}, {"id": 12, "prenom": "بكاري", "nom": "كوتي", "tel": "00221763133017", "niveauArabe": "3", "noteTest": "85", "appreciation": "جيد", "derniereSourate": "حافظ لكنه يراجع ما نسيه", "tazkiya": "أحمد ديينغ", "nasab": "باكر بن بول كوتي", "age": "39 سنة", "groupe": "المجموعة 2"}, {"id": 13, "prenom": "أنس", "nom": "أبو", "tel": "00221775034582", "niveauArabe": "3", "noteTest": "85", "appreciation": "جيد", "derniereSourate": "جزء عمّ", "tazkiya": "أحمد تيونغان", "nasab": "خادم بن مصطفى لوح أبو أنس", "age": "26 سنة", "groupe": "المجموعة 1"}, {"id": 14, "prenom": "حسن", "nom": "كا", "tel": "00221765721446", "niveauArabe": "3", "noteTest": "65", "appreciation": "مقبول", "derniereSourate": "الأحقاف ← الناس", "tazkiya": "موسى سار", "nasab": "حسن بن حسين كه", "age": "28 سنة", "groupe": "المجموعة 3"}, {"id": 15, "prenom": "بشير", "nom": "امبوب", "tel": "00221772815131", "niveauArabe": "3", "noteTest": "95", "appreciation": "مقبول", "derniereSourate": "الجاثية ← الناس / الكهف ← النور / البقرة ← الأعراف", "tazkiya": "أحمد ديينغ", "nasab": "سرنج بشيربن شيخ أحمد بمب امبوب", "age": "24 سنة", "groupe": "المجموعة 4"}, {"id": 16, "prenom": "محمد", "nom": "غاي", "tel": "00221784571520", "niveauArabe": "4", "noteTest": "75", "appreciation": "جيد", "derniereSourate": "حافظ", "tazkiya": "أحمد أبو عبد الله", "nasab": "محمد بن ماب بن علي غاي", "age": "سنة 23", "groupe": "المجموعة 1"}, {"id": 17, "prenom": "هارون", "nom": "تحجي", "tel": "0033783687283", "niveauArabe": "5", "noteTest": "85", "appreciation": "جيد", "derniereSourate": "الأحقاف ← الناس", "tazkiya": "عبد الله أبو عبد الرحمن", "nasab": "هارون بن إدريس تحجي", "age": "31 سنة", "groupe": "المجموعة 4"}];
+const SEED_TEACHERS = [{"id": 1, "name": "الأستاذ أحمد أبو عبد الله", "tel": "00201096471195", "location": "مصر", "subjects": "القرآن, التفسير, التجويد"}, {"id": 2, "name": "الأستاذ أحمد تيونغان", "tel": "00221776517121", "location": "السنغال", "subjects": "القرآن, الحديث"}, {"id": 3, "name": "الأستاذ لامين جيديو", "tel": "00221782529402", "location": "السنغال", "subjects": "الفقه"}, {"id": 4, "name": "الأستاذ محمد عزت", "tel": "00201149425349", "location": "مصر", "subjects": "العقيدة, المنهج"}, {"id": 5, "name": "الأستاذ أيمن صقر", "tel": "00201221518414", "location": "مصر", "subjects": "اللغة العربية"}, {"id": 6, "name": "الأستاذ إسماعيل تراؤوري", "tel": "00221774298533", "location": "السنغال", "subjects": "الأدب"}];
+
+const DEFAULT_SETTINGS = {
+  studentPagePassword: "Azerty1234@",
+  teacherPassword: "Azerty1234@",
+  adminUser: "admin",
+  adminPassword: "Azerty1234@",
+  recoveryEmail: "correia.domingo@gmail.com",
+  studentPageEnabled: true
+};
+
+// ================= I18N =================
+const I18N = {
+  fr: {
+    brand: "Bidayatou Al-Qari",
+    nav_home: "Accueil", nav_schedule: "Emploi du temps", nav_teachers: "Professeurs",
+    nav_students: "Étudiants", nav_attendance: "Assiduité", nav_grades: "Évaluations", nav_admin: "Administration",
+    home_desc: "Académie d'apprentissage des sciences islamiques en ligne — Programme académique du semestre 1.",
+    home_sched_desc: "Consultez les horaires des cours (Sénégal / Égypte)",
+    home_teach_desc: "L'équipe enseignante et leurs matières",
+    home_stud_desc: "Liste des étudiants admis (accès protégé)",
+    home_att_desc: "Émargement des étudiants par cours (professeurs)",
+    home_grades_desc: "Saisie des notes par matière (professeurs)",
+    home_admin_desc: "Gestion complète des données et paramètres",
+    sched_title: "Emploi du temps — Semestre 1",
+    sched_sub: "مشروع بداية القارئ — Les horaires sont affichés en heure du Sénégal 🇸🇳 et d'Égypte 🇪🇬",
+    all_teachers: "Tous les professeurs", all_subjects: "Toutes les matières",
+    teach_title: "Nos professeurs", teach_sub: "L'équipe enseignante du programme",
+    t_phone: "Téléphone", t_location: "Résidence", t_subjects: "Matières",
+    stud_gate_title: "Accès protégé", stud_gate_desc: "Cette page est réservée. Veuillez saisir le mot de passe.",
+    stud_title: "Liste des étudiants admis",
+    stud_disabled: "La page étudiants est actuellement désactivée par l'administrateur.",
+    pw_placeholder: "Mot de passe", btn_enter: "Entrer", btn_login: "Se connecter", btn_logout: "Déconnexion",
+    search_student: "Rechercher un étudiant…", all_groups: "Tous les groupes",
+    wrong_pw: "Mot de passe incorrect.", wrong_creds: "Identifiants incorrects.",
+    att_gate_title: "Espace professeurs — Assiduité",
+    att_gate_desc: "Sélectionnez votre nom et saisissez le mot de passe professeur.",
+    att_title: "Suivi de l'assiduité",
+    grades_gate_title: "Espace professeurs — Évaluations",
+    grades_title: "Saisie des évaluations",
+    lbl_teacher: "Professeur", lbl_password: "Mot de passe", lbl_username: "Identifiant",
+    lbl_course: "Cours", lbl_date: "Date", lbl_subject: "Matière", lbl_eval_label: "Intitulé de l'évaluation",
+    eval_label_ph: "Ex : Examen mi-semestre",
+    connected_as: "Connecté :",
+    admin_gate_title: "Administration", admin_gate_desc: "Accès réservé à l'administrateur.",
+    admin_hint: "Mot de passe oublié ? Contactez : correia.domingo@gmail.com",
+    admin_connected: "Administrateur connecté",
+    tab_reports: "Rapports", tab_settings: "Paramètres",
+    btn_add_student: "＋ Ajouter un étudiant", btn_add_teacher: "＋ Ajouter un professeur", btn_add_slot: "＋ Ajouter un créneau",
+    report_att_title: "📊 Rapport d'émargement",
+    report_att_desc: "Export Excel de toutes les feuilles de présence enregistrées, avec statistiques par étudiant.",
+    btn_export_att: "📥 Exporter l'émargement",
+    report_grades_title: "📊 Rapport des évaluations",
+    report_grades_desc: "Export Excel de toutes les notes saisies par les professeurs, avec moyennes par étudiant et par matière.",
+    btn_export_grades: "📥 Exporter les évaluations",
+    set_access_title: "🔐 Accès page Étudiants", set_stud_enabled: "Page étudiants activée",
+    set_stud_pw: "Mot de passe page étudiants",
+    set_teacher_title: "🔐 Mot de passe professeurs",
+    set_teacher_desc: "Utilisé pour les pages Assiduité et Évaluations.",
+    set_admin_title: "🔐 Compte administrateur", set_recovery: "Email de secours",
+    btn_save_settings: "💾 Enregistrer les paramètres", btn_save: "💾 Enregistrer",
+    btn_cancel: "Annuler", btn_delete: "🗑️ Supprimer", btn_edit: "✏️", 
+    confirm_title: "Confirmer la suppression", confirm_msg: "Voulez-vous vraiment supprimer :",
+    saved: "✅ Enregistré !", error: "❌ Erreur : ",
+    f_prenom: "Prénom (الاسم) *", f_nom: "Nom (اللقب) *", f_tel: "Téléphone (WhatsApp)", f_age: "Âge (العمر)",
+    f_arabe: "Niveau arabe /5", f_test: "Note test écrit /100", f_apprec: "Appréciation (التقدير)",
+    f_groupe: "Groupe Coran (المجموعة)", f_sourate: "Dernière sourate mémorisée", f_tazkiya: "Tazkiya (التزكية)", f_nasab: "Nasab (النسب)",
+    f_tname: "Nom complet *", f_tloc: "Lieu de résidence", f_tsubjects: "Matières (séparées par des virgules)",
+    f_day: "Jour *", f_subject: "Matière *", f_time_sn: "Horaire Sénégal 🇸🇳", f_time_eg: "Horaire Égypte 🇪🇬",
+    th_order: "N°", th_name: "Nom complet", th_tel: "Téléphone", th_arabe: "Arabe /5", th_test: "Test /100",
+    th_apprec: "Appréciation", th_sourate: "Dernière sourate", th_tazkiya: "Tazkiya", th_age: "Âge", th_groupe: "Groupe",
+    th_actions: "Actions", th_day: "Jour", th_time: "Horaire 🇸🇳 / 🇪🇬", th_subject: "Matière", th_teacher: "Professeur",
+    th_location: "Résidence", th_subjects: "Matières", th_present: "Présence", th_comment: "Commentaire", th_note: "Note /20",
+    present: "Présent", absent: "Absent",
+    att_save: "💾 Enregistrer la feuille de présence", grades_save: "💾 Enregistrer les notes",
+    att_saved: "✅ Feuille de présence enregistrée !", grades_saved: "✅ Notes enregistrées !",
+    no_course: "Aucun cours trouvé pour ce professeur dans l'emploi du temps.",
+    select_course: "Sélectionnez un cours et une date pour afficher la feuille de présence.",
+    select_subject: "Sélectionnez une matière pour saisir les notes.",
+    students_count: "étudiant(s) inscrit(s)",
+    loading: "Chargement…",
+    grades_note: "Laisser vide si l'étudiant n'est pas concerné. Les notes sont sur 20.",
+    day_sat: "Samedi", day_sun: "Dimanche", day_mon: "Lundi", day_tue: "Mardi", day_wed: "Mercredi", day_thu: "Jeudi", day_fri: "Vendredi",
+    nav_live: "Cours en direct",
+    home_live_desc: "Salles de visioconférence intégrées, sans limite de temps",
+    live_title: "Cours en direct",
+    live_sub: "Rejoignez la salle de classe virtuelle de votre cours. Les salles sont sans limite de durée.",
+    live_info_title: "ℹ️ Fonctionnement :",
+    live_info_txt: "La salle s'ouvre dans un nouvel onglet (gratuit et sans limite de durée). Le professeur qui ouvre la salle en premier devient modérateur (une connexion Google lui sera demandée la première fois), puis les étudiants rejoignent librement. Pour enregistrer le cours : menu ⋮ → « Démarrer l'enregistrement » → la vidéo est sauvegardée sur l'ordinateur du professeur, sans limite de durée.",
+    btn_join: "🎥 Rejoindre la salle",
+    btn_leave: "Quitter la salle",
+    live_room_generic: "Salle commune",
+    live_room_generic_desc: "Salle libre pour réunions, tutorat ou sessions hors emploi du temps",
+    tab_import: "Import Excel",
+    import_title: "📤 Importer un fichier Excel",
+    import_desc: "Sélectionnez le fichier Excel mis à jour (mêmes onglets : الفصل الدارسي ١ / الطلاب / الأساتذة). Un aperçu des changements sera affiché avant toute application.",
+    import_reading: "Lecture du fichier…",
+    import_summary_title: "Aperçu des changements",
+    import_students: "Étudiants", import_teachers: "Professeurs", import_schedule: "Emploi du temps",
+    import_added: "ajouté(s)", import_updated: "modifié(s)", import_removed: "supprimé(s)", import_unchanged: "inchangé(s)",
+    import_apply: "✅ Appliquer ces changements à la base de données",
+    import_applying: "⏳ Application en cours…",
+    import_done: "✅ Base de données mise à jour avec succès !",
+    import_error: "❌ Erreur : ",
+    import_error_format: "⚠️ Le fichier ne contient pas les onglets attendus (الفصل الدارسي ١ / الطلاب / الأساتذة).",
+    import_no_changes: "Aucun changement détecté."
+  },
+  ar: {
+    brand: "بداية القارئ",
+    nav_home: "الرئيسية", nav_schedule: "الجدول الدراسي", nav_teachers: "الأساتذة",
+    nav_students: "الطلاب", nav_attendance: "الحضور والغياب", nav_grades: "التقييمات", nav_admin: "الإدارة",
+    home_desc: "أكاديمية تعليم العلوم الشرعية عن بعد — البرنامج الأكاديمي للفصل الدراسي الأول.",
+    home_sched_desc: "اطلع على مواعيد الدروس (السنغال / مصر)",
+    home_teach_desc: "الهيئة التدريسية وموادهم",
+    home_stud_desc: "قائمة الطلاب المقبولين (وصول محمي)",
+    home_att_desc: "تسجيل حضور الطلاب لكل درس (للأساتذة)",
+    home_grades_desc: "إدخال الدرجات حسب المادة (للأساتذة)",
+    home_admin_desc: "إدارة كاملة للبيانات والإعدادات",
+    sched_title: "الجدول الدراسي — الفصل الأول",
+    sched_sub: "مشروع بداية القارئ — المواعيد معروضة بتوقيت السنغال 🇸🇳 ومصر 🇪🇬",
+    all_teachers: "جميع الأساتذة", all_subjects: "جميع المواد",
+    teach_title: "أساتذتنا", teach_sub: "الهيئة التدريسية للبرنامج",
+    t_phone: "الهاتف", t_location: "مكان السكن", t_subjects: "المواد",
+    stud_gate_title: "وصول محمي", stud_gate_desc: "هذه الصفحة خاصة. الرجاء إدخال كلمة المرور.",
+    stud_title: "قائمة الطلاب المقبولين",
+    stud_disabled: "صفحة الطلاب معطّلة حاليًا من قبل الإدارة.",
+    pw_placeholder: "كلمة المرور", btn_enter: "دخول", btn_login: "تسجيل الدخول", btn_logout: "تسجيل الخروج",
+    search_student: "ابحث عن طالب…", all_groups: "جميع المجموعات",
+    wrong_pw: "كلمة المرور غير صحيحة.", wrong_creds: "بيانات الدخول غير صحيحة.",
+    att_gate_title: "فضاء الأساتذة — الحضور والغياب",
+    att_gate_desc: "اختر اسمك وأدخل كلمة مرور الأساتذة.",
+    att_title: "متابعة الحضور والغياب",
+    grades_gate_title: "فضاء الأساتذة — التقييمات",
+    grades_title: "إدخال التقييمات",
+    lbl_teacher: "الأستاذ", lbl_password: "كلمة المرور", lbl_username: "اسم المستخدم",
+    lbl_course: "الدرس", lbl_date: "التاريخ", lbl_subject: "المادة", lbl_eval_label: "عنوان التقييم",
+    eval_label_ph: "مثال: اختبار منتصف الفصل",
+    connected_as: "متصل:",
+    admin_gate_title: "الإدارة", admin_gate_desc: "الوصول مخصص للمشرف فقط.",
+    admin_hint: "نسيت كلمة المرور؟ تواصل مع: correia.domingo@gmail.com",
+    admin_connected: "المشرف متصل",
+    tab_reports: "التقارير", tab_settings: "الإعدادات",
+    btn_add_student: "＋ إضافة طالب", btn_add_teacher: "＋ إضافة أستاذ", btn_add_slot: "＋ إضافة حصة",
+    report_att_title: "📊 تقرير الحضور",
+    report_att_desc: "تصدير Excel لجميع كشوف الحضور المسجلة، مع إحصائيات لكل طالب.",
+    btn_export_att: "📥 تصدير كشف الحضور",
+    report_grades_title: "📊 تقرير التقييمات",
+    report_grades_desc: "تصدير Excel لجميع الدرجات المدخلة من الأساتذة، مع المعدلات لكل طالب ومادة.",
+    btn_export_grades: "📥 تصدير التقييمات",
+    set_access_title: "🔐 الوصول لصفحة الطلاب", set_stud_enabled: "صفحة الطلاب مفعّلة",
+    set_stud_pw: "كلمة مرور صفحة الطلاب",
+    set_teacher_title: "🔐 كلمة مرور الأساتذة",
+    set_teacher_desc: "تُستخدم لصفحتي الحضور والتقييمات.",
+    set_admin_title: "🔐 حساب المشرف", set_recovery: "البريد الاحتياطي",
+    btn_save_settings: "💾 حفظ الإعدادات", btn_save: "💾 حفظ",
+    btn_cancel: "إلغاء", btn_delete: "🗑️ حذف", btn_edit: "✏️",
+    confirm_title: "تأكيد الحذف", confirm_msg: "هل تريد حقًا حذف:",
+    saved: "✅ تم الحفظ!", error: "❌ خطأ: ",
+    f_prenom: "الاسم *", f_nom: "اللقب *", f_tel: "رقم الهاتف (واتساب)", f_age: "العمر",
+    f_arabe: "مستوى اللغة العربية /5", f_test: "نتيجة الاختبار الكتابي /100", f_apprec: "التقدير العام",
+    f_groupe: "مجموعة القرآن", f_sourate: "آخر سورة محفوظة", f_tazkiya: "التزكية", f_nasab: "النسب",
+    f_tname: "الاسم الكامل *", f_tloc: "مكان السكن", f_tsubjects: "المواد (مفصولة بفواصل)",
+    f_day: "اليوم *", f_subject: "المادة *", f_time_sn: "توقيت السنغال 🇸🇳", f_time_eg: "توقيت مصر 🇪🇬",
+    th_order: "الترتيب", th_name: "الاسم الكامل", th_tel: "الهاتف", th_arabe: "العربية /5", th_test: "الاختبار /100",
+    th_apprec: "التقدير", th_sourate: "آخر سورة", th_tazkiya: "التزكية", th_age: "العمر", th_groupe: "المجموعة",
+    th_actions: "إجراءات", th_day: "اليوم", th_time: "التوقيت 🇸🇳 / 🇪🇬", th_subject: "المادة", th_teacher: "الأستاذ",
+    th_location: "مكان السكن", th_subjects: "المواد", th_present: "الحضور", th_comment: "ملاحظة", th_note: "الدرجة /20",
+    present: "حاضر", absent: "غائب",
+    att_save: "💾 حفظ كشف الحضور", grades_save: "💾 حفظ الدرجات",
+    att_saved: "✅ تم حفظ كشف الحضور!", grades_saved: "✅ تم حفظ الدرجات!",
+    no_course: "لا يوجد درس لهذا الأستاذ في الجدول الدراسي.",
+    select_course: "اختر درسًا وتاريخًا لعرض كشف الحضور.",
+    select_subject: "اختر مادة لإدخال الدرجات.",
+    students_count: "طالبًا مسجلاً",
+    loading: "جارٍ التحميل…",
+    grades_note: "اترك الخانة فارغة إذا لم يكن الطالب معنيًا. الدرجات من 20.",
+    day_sat: "السبت", day_sun: "الأحد", day_mon: "الاثنين", day_tue: "الثلاثاء", day_wed: "الأربعاء", day_thu: "الخميس", day_fri: "الجمعة",
+    nav_live: "الدروس المباشرة",
+    home_live_desc: "قاعات مؤتمرات فيديو مدمجة، بدون حد زمني",
+    live_title: "الدروس المباشرة",
+    live_sub: "انضم إلى القاعة الافتراضية لدرسك. القاعات بدون حد زمني.",
+    live_info_title: "ℹ️ طريقة العمل:",
+    live_info_txt: "تُفتح القاعة في نافذة جديدة (مجانًا وبدون حد زمني). الأستاذ الذي يفتح القاعة أولًا يصبح المشرف (سيُطلب منه تسجيل الدخول بحساب Google أول مرة)، ثم ينضم الطلاب بحرية. لتسجيل الدرس: القائمة ⋮ ← « بدء التسجيل » ← يُحفظ الفيديو على جهاز الأستاذ، بدون حد زمني.",
+    btn_join: "🎥 دخول القاعة",
+    btn_leave: "مغادرة القاعة",
+    live_room_generic: "القاعة العامة",
+    live_room_generic_desc: "قاعة حرة للاجتماعات أو الدروس الخصوصية أو الجلسات خارج الجدول",
+    tab_import: "استيراد Excel",
+    import_title: "📤 استيراد ملف Excel",
+    import_desc: "اختر ملف Excel المحدَّث (بنفس الأوراق: الفصل الدارسي ١ / الطلاب / الأساتذة). سيتم عرض ملخص التغييرات قبل التطبيق.",
+    import_reading: "جارٍ قراءة الملف…",
+    import_summary_title: "ملخص التغييرات",
+    import_students: "الطلاب", import_teachers: "الأساتذة", import_schedule: "الجدول الدراسي",
+    import_added: "إضافة", import_updated: "تعديل", import_removed: "حذف", import_unchanged: "بدون تغيير",
+    import_apply: "✅ تطبيق هذه التغييرات على قاعدة البيانات",
+    import_applying: "⏳ جارٍ التطبيق…",
+    import_done: "✅ تم تحديث قاعدة البيانات بنجاح!",
+    import_error: "❌ خطأ: ",
+    import_error_format: "⚠️ الملف لا يحتوي على الأوراق المتوقعة (الفصل الدارسي ١ / الطلاب / الأساتذة).",
+    import_no_changes: "لم يتم رصد أي تغيير."
+  }
+};
+
+const DAY_ORDER = ["السبت", "الأحد", "الاثنين", "الثلاثاء", "الأربعاء", "الخميس", "الجمعة"];
+const DAY_FR = {"السبت":"Samedi","الأحد":"Dimanche","الاثنين":"Lundi","الثلاثاء":"Mardi","الأربعاء":"Mercredi","الخميس":"Jeudi","الجمعة":"Vendredi"};
+
+// Nom complet = colonne K (النسب) du fichier Excel ; repli sur Prénom+Nom si absent
+function fullName(s) {
+  if (!s) return '';
+  return (s.nasab && s.nasab.trim()) ? s.nasab.trim() : `${s.prenom} ${s.nom}`;
+}
+
+// ================= STATE =================
+let lang = 'fr';
+let settings = {...DEFAULT_SETTINGS};
+let students = [];
+let teachers = [];
+let schedule = [];
+let attendanceCache = {};   // docId -> data
+let gradesCache = {};       // docId -> data
+let session = { studentsUnlocked: false, teacher: null, gradesTeacher: null, admin: false };
+let confirmAction = null;
+
+function t(key) { return (I18N[lang] && I18N[lang][key]) || I18N.fr[key] || key; }
+
+function applyI18n() {
+  document.querySelectorAll('[data-i18n]').forEach(el => { el.textContent = t(el.dataset.i18n); });
+  document.querySelectorAll('[data-i18n-ph]').forEach(el => { el.placeholder = t(el.dataset.i18nPh); });
+  document.getElementById('langBtn').textContent = lang === 'fr' ? 'العربية' : 'Français';
+  const html = document.getElementById('htmlRoot');
+  html.lang = lang;
+  html.dir = lang === 'ar' ? 'rtl' : 'ltr';
+}
+
+function toggleLang() {
+  lang = lang === 'fr' ? 'ar' : 'fr';
+  localStorage.setItem('bq_lang', lang);
+  applyI18n();
+  // re-render dynamic content
+  renderSchedule(); renderTeachers(); renderStudents();
+  renderAdminStudents(); renderAdminTeachers(); renderAdminSchedule();
+  if (document.getElementById('page-live').classList.contains('active')) renderLiveRooms();
+  populateGates();
+  if (session.teacher) { populateAttCourses(); loadAttendanceSheet(); }
+  if (session.gradesTeacher) { populateGradesSubjects(); loadGradesSheet(); }
+}
+
+// ================= FIREBASE =================
+async function fbReady() {
+  let n = 0;
+  while (!window._db && n < 50) { await new Promise(r => setTimeout(r, 100)); n++; }
+  if (!window._db) throw new Error('Firebase indisponible');
+}
+
+async function loadAll() {
+  await fbReady();
+  const { collection, getDocs, doc, getDoc, setDoc } = window._fs;
+
+  // Settings
+  const setSnap = await getDoc(doc(window._db, 'config', 'settings'));
+  if (setSnap.exists()) {
+    settings = {...DEFAULT_SETTINGS, ...setSnap.data()};
+  } else {
+    await setDoc(doc(window._db, 'config', 'settings'), DEFAULT_SETTINGS);
+    settings = {...DEFAULT_SETTINGS};
+  }
+
+  // Students
+  const stSnap = await getDocs(collection(window._db, 'bq_students'));
+  if (!stSnap.empty) {
+    students = []; stSnap.forEach(d => students.push({id: parseInt(d.id), ...d.data()}));
+    students.sort((a,b) => a.id - b.id);
+  } else {
+    for (const s of SEED_STUDENTS) await setDoc(doc(window._db, 'bq_students', String(s.id)), s);
+    students = [...SEED_STUDENTS];
+  }
+
+  // Teachers
+  const tSnap = await getDocs(collection(window._db, 'bq_teachers'));
+  if (!tSnap.empty) {
+    teachers = []; tSnap.forEach(d => teachers.push({id: parseInt(d.id), ...d.data()}));
+    teachers.sort((a,b) => a.id - b.id);
+  } else {
+    for (const te of SEED_TEACHERS) await setDoc(doc(window._db, 'bq_teachers', String(te.id)), te);
+    teachers = [...SEED_TEACHERS];
+  }
+
+  // Schedule
+  const scSnap = await getDocs(collection(window._db, 'bq_schedule'));
+  if (!scSnap.empty) {
+    schedule = []; scSnap.forEach(d => schedule.push({id: parseInt(d.id), ...d.data()}));
+    schedule.sort((a,b) => a.id - b.id);
+  } else {
+    for (const e of SEED_SCHEDULE) await setDoc(doc(window._db, 'bq_schedule', String(e.id)), e);
+    schedule = [...SEED_SCHEDULE];
+  }
+
+  // Attendance + grades (for reports)
+  const attSnap = await getDocs(collection(window._db, 'bq_attendance'));
+  attendanceCache = {}; attSnap.forEach(d => attendanceCache[d.id] = d.data());
+  const grSnap = await getDocs(collection(window._db, 'bq_grades'));
+  gradesCache = {}; grSnap.forEach(d => gradesCache[d.id] = d.data());
+}
+</script>
+<script>
+// ================= ROUTING =================
+function go(page) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('page-' + page).classList.add('active');
+  document.querySelectorAll('.nav-link').forEach(n => n.classList.toggle('active', n.dataset.page === page));
+  window.scrollTo(0, 0);
+  if (page === 'students') renderStudentsGate();
+  if (page === 'live') renderLiveRooms();
+}
+
+// ================= SCHEDULE =================
+function schedFilters() {
+  const tf = document.getElementById('schedTeacherFilter');
+  const sf = document.getElementById('schedSubjectFilter');
+  const selT = tf.value, selS = sf.value;
+  tf.innerHTML = `<option value="">${t('all_teachers')}</option>` +
+    [...new Set(schedule.map(e => e.teacher).filter(Boolean))].map(x => `<option value="${x}">${x}</option>`).join('');
+  sf.innerHTML = `<option value="">${t('all_subjects')}</option>` +
+    [...new Set(schedule.map(e => e.subject))].map(x => `<option value="${x}">${x}</option>`).join('');
+  tf.value = selT; sf.value = selS;
+}
+
+function renderSchedule() {
+  schedFilters();
+  const tFilter = document.getElementById('schedTeacherFilter').value;
+  const sFilter = document.getElementById('schedSubjectFilter').value;
+  const grid = document.getElementById('schedGrid');
+  grid.innerHTML = '';
+
+  DAY_ORDER.forEach(day => {
+    let slots = schedule.filter(e => e.day === day);
+    if (tFilter) slots = slots.filter(e => e.teacher === tFilter);
+    if (sFilter) slots = slots.filter(e => e.subject === sFilter);
+    if (!slots.length) return;
+    slots.sort((a,b) => a.timeSenegal.localeCompare(b.timeSenegal));
+
+    const dayLabel = lang === 'fr' ? `${DAY_FR[day]} · ${day}` : day;
+    const col = document.createElement('div');
+    col.className = 'day-col';
+    col.innerHTML = `<div class="day-head">${dayLabel}</div>` + slots.map(s => `
+      <div class="slot">
+        <div class="slot-time">🇸🇳 ${s.timeSenegal} <span class="tz">🇪🇬 ${s.timeEgypt}</span></div>
+        <div class="slot-subject">${s.subject}</div>
+        <div class="slot-teacher">${s.teacher || ''}</div>
+      </div>`).join('');
+    grid.appendChild(col);
+  });
+
+  if (!grid.children.length) {
+    grid.innerHTML = `<div class="empty-note">—</div>`;
+  }
+}
+
+// ================= TEACHERS =================
+function renderTeachers() {
+  const grid = document.getElementById('teachersGrid');
+  grid.innerHTML = teachers.map(te => `
+    <div class="t-card">
+      <div class="t-head">
+        <div class="t-avatar">${(te.name || '؟').replace('الأستاذ','').trim()[0] || '؟'}</div>
+        <div>
+          <div class="t-name">${te.name}</div>
+          <div class="t-loc">📍 ${te.location || '—'}</div>
+        </div>
+      </div>
+      <div class="t-row"><span class="lbl">${t('t_phone')}</span> <span dir="ltr">${te.tel || '—'}</span></div>
+      <div class="t-row"><span class="lbl">${t('t_subjects')}</span>
+        <span>${(te.subjects || '').split(',').map(s => `<span class="badge badge-navy" style="margin:2px;">${s.trim()}</span>`).join(' ')}</span>
+      </div>
+    </div>`).join('');
+}
+
+// ================= STUDENTS (protected) =================
+function renderStudentsGate() {
+  const gate = document.getElementById('studentsGate');
+  const content = document.getElementById('studentsContent');
+  if (!settings.studentPageEnabled) {
+    gate.innerHTML = `<div class="gate-icon">🚫</div><h2>${t('stud_gate_title')}</h2><p>${t('stud_disabled')}</p>`;
+    gate.classList.remove('hidden');
+    content.classList.add('hidden');
+    return;
+  }
+  if (session.studentsUnlocked) {
+    gate.classList.add('hidden');
+    content.classList.remove('hidden');
+    renderStudents();
+  } else {
+    gate.classList.remove('hidden');
+    content.classList.add('hidden');
+  }
+}
+
+function unlockStudents() {
+  const pw = document.getElementById('studentsPw').value;
+  if (pw === settings.studentPagePassword) {
+    session.studentsUnlocked = true;
+    renderStudentsGate();
+  } else {
+    document.getElementById('studentsGateErr').textContent = t('wrong_pw');
+  }
+}
+
+function renderStudents() {
+  if (!session.studentsUnlocked) return;
+  const search = (document.getElementById('studSearch').value || '').toLowerCase();
+  const gf = document.getElementById('studGroupFilter');
+  const selG = gf.value;
+  gf.innerHTML = `<option value="">${t('all_groups')}</option>` +
+    [...new Set(students.map(s => s.groupe).filter(Boolean))].sort().map(g => `<option value="${g}">${g}</option>`).join('');
+  gf.value = selG;
+
+  let list = students.filter(s => {
+    const full = fullName(s).toLowerCase();
+    if (search && !full.includes(search)) return false;
+    if (selG && s.groupe !== selG) return false;
+    return true;
+  });
+
+  document.getElementById('studCount').textContent = `${list.length} ${t('students_count')}`;
+
+  const apprecBadge = a => {
+    const map = {'ممتاز':'badge-green','جيد جدًا':'badge-navy','جيد':'badge-gold','مقبول':'badge-gray'};
+    return `<span class="badge ${map[a] || 'badge-gray'}">${a || '—'}</span>`;
+  };
+
+  document.getElementById('studentsTable').innerHTML = `
+    <thead><tr>
+      <th>${t('th_order')}</th><th>${t('th_name')}</th><th>${t('th_tel')}</th>
+      <th>${t('th_arabe')}</th><th>${t('th_test')}</th><th>${t('th_apprec')}</th>
+      <th>${t('th_sourate')}</th><th>${t('th_tazkiya')}</th><th>${t('th_age')}</th><th>${t('th_groupe')}</th>
+    </tr></thead>
+    <tbody>${list.map(s => `
+      <tr>
+        <td>${s.id}</td>
+        <td style="font-weight:600;">${fullName(s)}</td>
+        <td dir="ltr" style="font-size:12px;">${s.tel || '—'}</td>
+        <td>${s.niveauArabe || '—'}</td>
+        <td>${s.noteTest || '—'}</td>
+        <td>${apprecBadge(s.appreciation)}</td>
+        <td style="font-size:12px;max-width:220px;">${s.derniereSourate || '—'}</td>
+        <td style="font-size:12px;">${s.tazkiya || '—'}</td>
+        <td>${s.age || '—'}</td>
+        <td>${s.groupe ? `<span class="badge badge-gold">${s.groupe}</span>` : '—'}</td>
+      </tr>`).join('')}</tbody>`;
+}
+
+// ================= GATES POPULATE =================
+function populateGates() {
+  const opts = teachers.map(te => `<option value="${te.id}">${te.name}</option>`).join('');
+  document.getElementById('attTeacherSel').innerHTML = opts;
+  document.getElementById('gradesTeacherSel').innerHTML = opts;
+}
+</script>
+<script>
+// ================= ATTENDANCE =================
+function unlockAttendance() {
+  const pw = document.getElementById('attPw').value;
+  const tid = parseInt(document.getElementById('attTeacherSel').value);
+  if (pw === settings.teacherPassword) {
+    session.teacher = teachers.find(te => te.id === tid);
+    document.getElementById('attGate').classList.add('hidden');
+    document.getElementById('attContent').classList.remove('hidden');
+    document.getElementById('attTeacherName').textContent = session.teacher.name;
+    document.getElementById('attDate').value = new Date().toISOString().slice(0,10);
+    populateAttCourses();
+    loadAttendanceSheet();
+  } else {
+    document.getElementById('attGateErr').textContent = t('wrong_pw');
+  }
+}
+
+function logoutAttendance() {
+  session.teacher = null;
+  document.getElementById('attGate').classList.remove('hidden');
+  document.getElementById('attContent').classList.add('hidden');
+  document.getElementById('attPw').value = '';
+}
+
+function teacherCourses(teacherName) {
+  // Unique subject+day+time combos for this teacher
+  return schedule.filter(e => e.teacher === teacherName);
+}
+
+function populateAttCourses() {
+  if (!session.teacher) return;
+  const courses = teacherCourses(session.teacher.name);
+  const sel = document.getElementById('attCourseSel');
+  if (!courses.length) {
+    sel.innerHTML = `<option value="">${t('no_course')}</option>`;
+    return;
+  }
+  sel.innerHTML = courses.map(c => {
+    const dayLabel = lang === 'fr' ? DAY_FR[c.day] : c.day;
+    return `<option value="${c.id}">${c.subject} — ${dayLabel} ${c.timeSenegal}</option>`;
+  }).join('');
+}
+
+function groupOfSubject(subject) {
+  const m = subject.match(/المجموعة\s*(\d)/);
+  return m ? `المجموعة ${m[1]}` : null;
+}
+
+function studentsForCourse(course) {
+  const grp = groupOfSubject(course.subject);
+  if (grp) return students.filter(s => s.groupe === grp);
+  return students; // common subjects: all students
+}
+
+function attDocId(courseId, date) { return `${date}_c${courseId}`; }
+
+function loadAttendanceSheet() {
+  const sheet = document.getElementById('attSheet');
+  if (!session.teacher) return;
+  const courseId = parseInt(document.getElementById('attCourseSel').value);
+  const date = document.getElementById('attDate').value;
+  const course = schedule.find(e => e.id === courseId);
+  if (!course || !date) {
+    sheet.innerHTML = `<div class="empty-note">${t('select_course')}</div>`;
+    return;
+  }
+  const docId = attDocId(courseId, date);
+  const existing = attendanceCache[docId];
+  const list = studentsForCourse(course);
+
+  sheet.innerHTML = `
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>${t('th_order')}</th><th>${t('th_name')}</th><th>${t('th_groupe')}</th><th>${t('th_present')}</th><th>${t('th_comment')}</th></tr></thead>
+        <tbody>
+          ${list.map(s => {
+            const rec = existing && existing.records && existing.records[s.id];
+            const present = rec ? rec.present : null;
+            const comment = rec ? (rec.comment || '') : '';
+            return `<tr>
+              <td>${s.id}</td>
+              <td style="font-weight:600;">${fullName(s)}</td>
+              <td>${s.groupe ? `<span class="badge badge-gold">${s.groupe}</span>` : '—'}</td>
+              <td>
+                <div class="presence-toggle">
+                  <button class="pt-btn present ${present === true ? 'sel' : ''}" onclick="setPresence(this, ${s.id}, true)">✓ ${t('present')}</button>
+                  <button class="pt-btn absent ${present === false ? 'sel' : ''}" onclick="setPresence(this, ${s.id}, false)">✗ ${t('absent')}</button>
+                </div>
+              </td>
+              <td><input class="input att-comment" data-sid="${s.id}" value="${comment.replace(/"/g,'&quot;')}" style="min-width:160px;font-size:12.5px;padding:7px 10px;"></td>
+            </tr>`;
+          }).join('')}
+        </tbody>
+      </table>
+    </div>
+    <div style="margin-top:16px;display:flex;gap:12px;align-items:center;flex-wrap:wrap;">
+      <button class="btn btn-primary" onclick="saveAttendance()">${t('att_save')}</button>
+      <div class="status-msg" id="attStatus" style="margin:0;"></div>
+    </div>`;
+
+  window._attState = {};
+  list.forEach(s => {
+    const rec = existing && existing.records && existing.records[s.id];
+    window._attState[s.id] = rec ? rec.present : null;
+  });
+}
+
+function setPresence(btn, sid, val) {
+  window._attState[sid] = val;
+  const row = btn.closest('tr');
+  row.querySelectorAll('.pt-btn').forEach(b => b.classList.remove('sel'));
+  btn.classList.add('sel');
+}
+
+async function saveAttendance() {
+  const courseId = parseInt(document.getElementById('attCourseSel').value);
+  const date = document.getElementById('attDate').value;
+  const course = schedule.find(e => e.id === courseId);
+  if (!course || !date) return;
+  const status = document.getElementById('attStatus');
+  status.textContent = '⏳…'; status.style.color = 'var(--muted)';
+
+  const records = {};
+  document.querySelectorAll('.att-comment').forEach(inp => {
+    const sid = parseInt(inp.dataset.sid);
+    records[sid] = {
+      present: window._attState[sid],
+      comment: inp.value.trim()
+    };
+  });
+
+  const docId = attDocId(courseId, date);
+  const data = {
+    date, courseId,
+    subject: course.subject,
+    day: course.day,
+    time: course.timeSenegal,
+    teacher: session.teacher.name,
+    records,
+    savedAt: new Date().toISOString()
+  };
+
+  try {
+    const { doc, setDoc } = window._fs;
+    await setDoc(doc(window._db, 'bq_attendance', docId), data);
+    attendanceCache[docId] = data;
+    status.textContent = t('att_saved'); status.style.color = 'var(--green)';
+  } catch(e) {
+    status.textContent = t('error') + e.message; status.style.color = 'var(--red)';
+  }
+}
+
+// ================= GRADES =================
+function unlockGrades() {
+  const pw = document.getElementById('gradesPw').value;
+  const tid = parseInt(document.getElementById('gradesTeacherSel').value);
+  if (pw === settings.teacherPassword) {
+    session.gradesTeacher = teachers.find(te => te.id === tid);
+    document.getElementById('gradesGate').classList.add('hidden');
+    document.getElementById('gradesContent').classList.remove('hidden');
+    document.getElementById('gradesTeacherName').textContent = session.gradesTeacher.name;
+    document.getElementById('gradesDate').value = new Date().toISOString().slice(0,10);
+    populateGradesSubjects();
+    loadGradesSheet();
+  } else {
+    document.getElementById('gradesGateErr').textContent = t('wrong_pw');
+  }
+}
+
+function logoutGrades() {
+  session.gradesTeacher = null;
+  document.getElementById('gradesGate').classList.remove('hidden');
+  document.getElementById('gradesContent').classList.add('hidden');
+  document.getElementById('gradesPw').value = '';
+}
+
+function populateGradesSubjects() {
+  if (!session.gradesTeacher) return;
+  const subjects = [...new Set(teacherCourses(session.gradesTeacher.name).map(c => c.subject))];
+  const sel = document.getElementById('gradesSubjectSel');
+  sel.innerHTML = subjects.length
+    ? subjects.map(s => `<option value="${s}">${s}</option>`).join('')
+    : `<option value="">${t('no_course')}</option>`;
+}
+
+function loadGradesSheet() {
+  const sheet = document.getElementById('gradesSheet');
+  if (!session.gradesTeacher) return;
+  const subject = document.getElementById('gradesSubjectSel').value;
+  if (!subject) {
+    sheet.innerHTML = `<div class="empty-note">${t('select_subject')}</div>`;
+    return;
+  }
+  const grp = groupOfSubject(subject);
+  const list = grp ? students.filter(s => s.groupe === grp) : students;
+
+  sheet.innerHTML = `
+    <p style="font-size:12.5px;color:var(--muted);margin-bottom:12px;">${t('grades_note')}</p>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>${t('th_order')}</th><th>${t('th_name')}</th><th>${t('th_groupe')}</th><th>${t('th_note')}</th><th>${t('th_comment')}</th></tr></thead>
+        <tbody>
+          ${list.map(s => `<tr>
+            <td>${s.id}</td>
+            <td style="font-weight:600;">${fullName(s)}</td>
+            <td>${s.groupe ? `<span class="badge badge-gold">${s.groupe}</span>` : '—'}</td>
+            <td><input type="number" min="0" max="20" step="0.25" class="note-input grade-note" data-sid="${s.id}"></td>
+            <td><input class="input grade-comment" data-sid="${s.id}" style="min-width:160px;font-size:12.5px;padding:7px 10px;"></td>
+          </tr>`).join('')}
+        </tbody>
+      </table>
+    </div>
+    <div style="margin-top:16px;display:flex;gap:12px;align-items:center;flex-wrap:wrap;">
+      <button class="btn btn-primary" onclick="saveGrades()">${t('grades_save')}</button>
+      <div class="status-msg" id="gradesStatus" style="margin:0;"></div>
+    </div>`;
+}
+
+async function saveGrades() {
+  const subject = document.getElementById('gradesSubjectSel').value;
+  const label = document.getElementById('gradesLabel').value.trim() || 'Évaluation';
+  const date = document.getElementById('gradesDate').value || new Date().toISOString().slice(0,10);
+  const status = document.getElementById('gradesStatus');
+  status.textContent = '⏳…'; status.style.color = 'var(--muted)';
+
+  const notes = {};
+  document.querySelectorAll('.grade-note').forEach(inp => {
+    const sid = parseInt(inp.dataset.sid);
+    const val = inp.value.trim();
+    const comment = document.querySelector(`.grade-comment[data-sid="${sid}"]`).value.trim();
+    if (val !== '' || comment !== '') {
+      notes[sid] = { note: val !== '' ? parseFloat(val) : null, comment };
+    }
+  });
+
+  if (!Object.keys(notes).length) {
+    status.textContent = '⚠️ —'; status.style.color = 'var(--gold)';
+    return;
+  }
+
+  const docId = `${date}_${subject.replace(/\s+/g,'_')}_${Date.now()}`;
+  const data = {
+    date, subject, label,
+    teacher: session.gradesTeacher.name,
+    notes,
+    savedAt: new Date().toISOString()
+  };
+
+  try {
+    const { doc, setDoc } = window._fs;
+    await setDoc(doc(window._db, 'bq_grades', docId), data);
+    gradesCache[docId] = data;
+    status.textContent = t('grades_saved'); status.style.color = 'var(--green)';
+  } catch(e) {
+    status.textContent = t('error') + e.message; status.style.color = 'var(--red)';
+  }
+}
+</script>
+<script>
+
+// ================= LIVE (Jitsi — nouvel onglet) =================
+function roomSlug(str) {
+  // Nom de salle ASCII stable et unique par matière
+  return 'BidayatouAlQari-' + btoa(unescape(encodeURIComponent(str))).replace(/[^a-zA-Z0-9]/g, '').slice(0, 30);
+}
+
+function roomUrl(subjectName) {
+  const params = new URLSearchParams({
+    'config.subject': subjectName,
+    'config.startWithAudioMuted': 'true'
+  });
+  return `https://meet.jit.si/${roomSlug(subjectName)}#${params.toString().replace(/&/g, '&')}`;
+}
+
+function renderLiveRooms() {
+  const grid = document.getElementById('liveRoomsGrid');
+  const subjects = [...new Set(schedule.map(e => e.subject))];
+  const cards = subjects.map(sub => {
+    const teachersOf = [...new Set(schedule.filter(e => e.subject === sub).map(e => e.teacher).filter(Boolean))];
+    return `
+    <div class="t-card">
+      <div class="t-head">
+        <div class="t-avatar" style="background:linear-gradient(135deg,var(--gold),var(--gold-light));color:var(--navy-dark);">🎥</div>
+        <div>
+          <div class="t-name">${sub}</div>
+          <div class="t-loc">${teachersOf.join(' · ') || '—'}</div>
+        </div>
+      </div>
+      <button class="btn btn-primary btn-sm" style="width:100%;" onclick="joinRoom('${sub.replace(/'/g, "\\'")}')">${t('btn_join')}</button>
+    </div>`;
+  });
+  cards.push(`
+    <div class="t-card" style="border-style:dashed;">
+      <div class="t-head">
+        <div class="t-avatar" style="background:linear-gradient(135deg,#475569,#64748b);">🏛️</div>
+        <div>
+          <div class="t-name">${t('live_room_generic')}</div>
+          <div class="t-loc" style="font-size:11.5px;">${t('live_room_generic_desc')}</div>
+        </div>
+      </div>
+      <button class="btn btn-gold btn-sm" style="width:100%;" onclick="joinRoom('${t('live_room_generic')}')">${t('btn_join')}</button>
+    </div>`);
+  grid.innerHTML = cards.join('');
+}
+
+function joinRoom(subjectName) {
+  // Ouverture dans un nouvel onglet : gratuit et sans limite de durée sur meet.jit.si
+  window.open(roomUrl(subjectName), '_blank', 'noopener');
+}
+
+
+// ================= IMPORT EXCEL =================
+let pendingImport = null; // { students, teachers, schedule, diffs }
+
+function excelCell(ws, r, cIdx) {
+  const addr = XLSX.utils.encode_cell({ r, c: cIdx });
+  const cell = ws[addr];
+  return cell ? cell.v : undefined;
+}
+
+function parseImportWorkbook(wb) {
+  const sheetNames = wb.SheetNames;
+  const schedSheetName = sheetNames.find(n => n.includes('الفصل'));
+  const studSheetName = sheetNames.find(n => n === 'الطلاب' || n.includes('الطلاب') || n.includes('الطالب'));
+  const teachSheetName = sheetNames.find(n => n.includes('الأساتذة'));
+
+  if (!schedSheetName || !studSheetName || !teachSheetName) {
+    throw new Error(t('import_error_format'));
+  }
+
+  // ---- SCHEDULE ----
+  const wsSched = wb.Sheets[schedSheetName];
+  const dayCols = {3:'السبت',4:'السبت',5:'الأحد',6:'الاثنين',7:'الاثنين',8:'الثلاثاء',9:'الثلاثاء',10:'الأربعاء',11:'الخميس'};
+  const scheduleOut = [];
+  let eid = 1;
+  for (let i = 3; i < 13; i++) {
+    const tSn = excelCell(wsSched, i, 1);
+    const tEg = excelCell(wsSched, i, 2);
+    if (tSn === undefined || tSn === null || tSn === '') continue;
+    for (const [colStr, day] of Object.entries(dayCols)) {
+      const col = parseInt(colStr);
+      const val = excelCell(wsSched, i, col);
+      if (val === undefined || val === null || val === '') continue;
+      const parts = String(val).trim().split('\n');
+      scheduleOut.push({
+        id: eid,
+        day,
+        timeSenegal: String(tSn).trim().replace(/h/g, ':'),
+        timeEgypt: String(tEg).trim(),
+        subject: parts[0].trim(),
+        teacher: parts[1] ? parts[1].trim() : ''
+      });
+      eid++;
+    }
+  }
+
+  // ---- STUDENTS (header row 0) ----
+  const studRows = XLSX.utils.sheet_to_json(wb.Sheets[studSheetName], { defval: '' });
+  const studentsOut = [];
+  for (const row of studRows) {
+    const prenom = row['الاسم'];
+    if (!prenom) continue;
+    const g = (key) => (row[key] !== undefined && row[key] !== null) ? String(row[key]).trim() : '';
+    studentsOut.push({
+      id: parseInt(row['الترتيب']),
+      prenom: g('الاسم'),
+      nom: g('اللقب'),
+      tel: g("رقم الهاتف (واتساب)").replace(/\n/g, ' / '),
+      niveauArabe: g('اللغة العربية'),
+      noteTest: g('نتيجة الاختبار الكتابي'),
+      appreciation: g('التقدير العام'),
+      derniereSourate: g('آخر سورة محفوظة'),
+      tazkiya: g('التزكية'),
+      nasab: g('النسب'),
+      age: g('العمر'),
+      groupe: g('مجموعة القرآن')
+    });
+  }
+
+  // ---- TEACHERS ----
+  const teachRows = XLSX.utils.sheet_to_json(wb.Sheets[teachSheetName], { header: 1, defval: '' });
+  const teachersOut = [];
+  let tid = 1;
+  for (let i = 1; i < teachRows.length; i++) {
+    const row = teachRows[i];
+    if (!row[0]) continue;
+    teachersOut.push({
+      id: tid,
+      name: String(row[0]).trim(),
+      tel: String(row[1] || '').trim(),
+      location: String(row[2] || '').trim(),
+      subjects: String(row[3] || '').trim()
+    });
+    tid++;
+  }
+
+  return { students: studentsOut, teachers: teachersOut, schedule: scheduleOut };
+}
+
+function diffCollections(oldList, newList, keyField) {
+  const oldMap = {}; oldList.forEach(x => oldMap[x[keyField]] = x);
+  const newMap = {}; newList.forEach(x => newMap[x[keyField]] = x);
+  const oldIds = new Set(oldList.map(x => x[keyField]));
+  const newIds = new Set(newList.map(x => x[keyField]));
+
+  const added = [...newIds].filter(id => !oldIds.has(id));
+  const removed = [...oldIds].filter(id => !newIds.has(id));
+  const common = [...newIds].filter(id => oldIds.has(id));
+  const updated = common.filter(id => JSON.stringify(oldMap[id]) !== JSON.stringify(newMap[id]));
+  const unchanged = common.filter(id => JSON.stringify(oldMap[id]) === JSON.stringify(newMap[id]));
+
+  return { added, removed, updated, unchanged };
+}
+
+async function handleImportFile(ev) {
+  const file = ev.target.files[0];
+  if (!file) return;
+  const preview = document.getElementById('importPreview');
+  preview.innerHTML = `<p style="color:var(--muted);font-size:13px;">⏳ ${t('import_reading')}</p>`;
+
+  try {
+    const buf = await file.arrayBuffer();
+    const wb = XLSX.read(buf, { type: 'array' });
+    const parsed = parseImportWorkbook(wb);
+
+    const dS = diffCollections(students, parsed.students, 'id');
+    const dT = diffCollections(teachers, parsed.teachers, 'id');
+    const dC = diffCollections(schedule, parsed.schedule, 'id');
+
+    pendingImport = { ...parsed, diffs: { students: dS, teachers: dT, schedule: dC } };
+
+    const totalChanges = dS.added.length + dS.removed.length + dS.updated.length
+      + dT.added.length + dT.removed.length + dT.updated.length
+      + dC.added.length + dC.removed.length + dC.updated.length;
+
+    const row = (label, d) => `
+      <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);font-size:13.5px;">
+        <span style="font-weight:600;">${label}</span>
+        <span>
+          <span class="badge badge-green">+${d.added.length} ${t('import_added')}</span>
+          <span class="badge badge-navy">${d.updated.length} ${t('import_updated')}</span>
+          <span class="badge badge-red">-${d.removed.length} ${t('import_removed')}</span>
+          <span class="badge badge-gray">${d.unchanged.length} ${t('import_unchanged')}</span>
+        </span>
+      </div>`;
+
+    if (totalChanges === 0) {
+      preview.innerHTML = `<p style="color:var(--muted);font-size:13px;">${t('import_no_changes')}</p>`;
+      return;
+    }
+
+    preview.innerHTML = `
+      <h4 style="font-size:14px;color:var(--navy-dark);margin-bottom:10px;">${t('import_summary_title')}</h4>
+      ${row(t('import_students'), dS)}
+      ${row(t('import_teachers'), dT)}
+      ${row(t('import_schedule'), dC)}
+      <button class="btn btn-gold" style="width:100%;margin-top:16px;" onclick="applyImport()">${t('import_apply')}</button>
+      <div class="status-msg" id="importStatus"></div>
+    `;
+  } catch(e) {
+    preview.innerHTML = `<p style="color:var(--red);font-size:13px;">${t('import_error')}${e.message}</p>`;
+  }
+}
+
+async function applyImport() {
+  if (!pendingImport) return;
+  const status = document.getElementById('importStatus');
+  status.textContent = t('import_applying');
+  status.style.color = 'var(--muted)';
+
+  try {
+    const { doc, setDoc, deleteDoc } = window._fs;
+
+    // Students
+    for (const s of pendingImport.students) await setDoc(doc(window._db, 'bq_students', String(s.id)), s);
+    for (const id of pendingImport.diffs.students.removed) await deleteDoc(doc(window._db, 'bq_students', String(id)));
+
+    // Teachers
+    for (const te of pendingImport.teachers) await setDoc(doc(window._db, 'bq_teachers', String(te.id)), te);
+    for (const id of pendingImport.diffs.teachers.removed) await deleteDoc(doc(window._db, 'bq_teachers', String(id)));
+
+    // Schedule
+    for (const sl of pendingImport.schedule) await setDoc(doc(window._db, 'bq_schedule', String(sl.id)), sl);
+    for (const id of pendingImport.diffs.schedule.removed) await deleteDoc(doc(window._db, 'bq_schedule', String(id)));
+
+    // Update local state
+    students = [...pendingImport.students];
+    teachers = [...pendingImport.teachers];
+    schedule = [...pendingImport.schedule];
+
+    // Refresh all views
+    populateGates();
+    renderStudents(); renderTeachers(); renderSchedule();
+    renderAdminStudents(); renderAdminTeachers(); renderAdminSchedule();
+
+    status.textContent = t('import_done');
+    status.style.color = 'var(--green)';
+    pendingImport = null;
+    document.getElementById('importFile').value = '';
+  } catch(e) {
+    status.textContent = t('import_error') + e.message;
+    status.style.color = 'var(--red)';
+  }
+}
+
+// ================= ADMIN =================
+function unlockAdmin() {
+  const user = document.getElementById('adminUser').value.trim();
+  const pw = document.getElementById('adminPw').value;
+  if (user === settings.adminUser && pw === settings.adminPassword) {
+    session.admin = true;
+    document.getElementById('adminGate').classList.add('hidden');
+    document.getElementById('adminContent').classList.remove('hidden');
+    renderAdminStudents(); renderAdminTeachers(); renderAdminSchedule(); fillSettingsForm();
+  } else {
+    document.getElementById('adminGateErr').textContent = t('wrong_creds');
+  }
+}
+
+function logoutAdmin() {
+  session.admin = false;
+  document.getElementById('adminGate').classList.remove('hidden');
+  document.getElementById('adminContent').classList.add('hidden');
+  document.getElementById('adminPw').value = '';
+}
+
+function adminTab(tab) {
+  document.querySelectorAll('.admin-tab').forEach(b => b.classList.toggle('active', b.dataset.tab === tab));
+  document.querySelectorAll('.admin-panel').forEach(p => p.classList.remove('active'));
+  document.getElementById('admin-' + tab).classList.add('active');
+}
+
+function openOv(id) { document.getElementById(id).classList.add('open'); document.body.style.overflow = 'hidden'; }
+function closeOv(id) { document.getElementById(id).classList.remove('open'); document.body.style.overflow = ''; }
+
+// ----- Admin: students -----
+let editingStudentId = null;
+
+function renderAdminStudents() {
+  if (!session.admin) return;
+  document.getElementById('adminStudentsTable').innerHTML = `
+    <thead><tr><th>${t('th_order')}</th><th>${t('th_name')}</th><th>${t('th_tel')}</th><th>${t('th_groupe')}</th><th>${t('th_apprec')}</th><th>${t('th_actions')}</th></tr></thead>
+    <tbody>${students.map(s => `<tr>
+      <td>${s.id}</td>
+      <td style="font-weight:600;">${fullName(s)}</td>
+      <td dir="ltr" style="font-size:12px;">${s.tel || '—'}</td>
+      <td>${s.groupe || '—'}</td>
+      <td>${s.appreciation || '—'}</td>
+      <td style="white-space:nowrap;">
+        <button class="btn btn-ghost btn-sm" onclick="openStudentForm(${s.id})">✏️</button>
+        <button class="btn btn-danger btn-sm" onclick="askDelete('student', ${s.id}, '${fullName(s).replace(/'/g, "\\'")}')">🗑️</button>
+      </td>
+    </tr>`).join('')}</tbody>`;
+}
+
+function openStudentForm(id) {
+  editingStudentId = id;
+  const s = id ? students.find(x => x.id === id) : null;
+  document.getElementById('studentFormTitle').textContent = s ? `✏️ ${fullName(s)}` : t('btn_add_student');
+  document.getElementById('fPrenom').value = s ? s.prenom : '';
+  document.getElementById('fNom').value = s ? s.nom : '';
+  document.getElementById('fTel').value = s ? s.tel : '';
+  document.getElementById('fAge').value = s ? s.age : '';
+  document.getElementById('fArabe').value = s ? s.niveauArabe : '';
+  document.getElementById('fTest').value = s ? s.noteTest : '';
+  document.getElementById('fApprec').value = s ? (s.appreciation || 'جيد') : 'جيد';
+  document.getElementById('fGroupe').value = s ? (s.groupe || '') : 'المجموعة 1';
+  document.getElementById('fSourate').value = s ? s.derniereSourate : '';
+  document.getElementById('fTazkiya').value = s ? s.tazkiya : '';
+  document.getElementById('fNasab').value = s ? s.nasab : '';
+  document.getElementById('studentFormStatus').textContent = '';
+  openOv('ovStudent');
+}
+
+async function saveStudent() {
+  const prenom = document.getElementById('fPrenom').value.trim();
+  const nom = document.getElementById('fNom').value.trim();
+  const status = document.getElementById('studentFormStatus');
+  if (!prenom || !nom) { status.textContent = '⚠️'; status.style.color = 'var(--red)'; return; }
+  status.textContent = '⏳…'; status.style.color = 'var(--muted)';
+
+  let id = editingStudentId;
+  if (!id) id = students.length ? Math.max(...students.map(s => s.id)) + 1 : 1;
+
+  const data = {
+    id, prenom, nom,
+    tel: document.getElementById('fTel').value.trim(),
+    age: document.getElementById('fAge').value.trim(),
+    niveauArabe: document.getElementById('fArabe').value.trim(),
+    noteTest: document.getElementById('fTest').value.trim(),
+    appreciation: document.getElementById('fApprec').value,
+    groupe: document.getElementById('fGroupe').value,
+    derniereSourate: document.getElementById('fSourate').value.trim(),
+    tazkiya: document.getElementById('fTazkiya').value.trim(),
+    nasab: document.getElementById('fNasab').value.trim()
+  };
+
+  try {
+    const { doc, setDoc } = window._fs;
+    await setDoc(doc(window._db, 'bq_students', String(id)), data);
+    if (editingStudentId) {
+      students[students.findIndex(s => s.id === id)] = data;
+    } else {
+      students.push(data);
+    }
+    status.textContent = t('saved'); status.style.color = 'var(--green)';
+    renderAdminStudents(); renderStudents();
+    setTimeout(() => closeOv('ovStudent'), 650);
+  } catch(e) {
+    status.textContent = t('error') + e.message; status.style.color = 'var(--red)';
+  }
+}
+
+// ----- Admin: teachers -----
+let editingTeacherId = null;
+
+function renderAdminTeachers() {
+  if (!session.admin) return;
+  document.getElementById('adminTeachersTable').innerHTML = `
+    <thead><tr><th>${t('th_name')}</th><th>${t('th_tel')}</th><th>${t('th_location')}</th><th>${t('th_subjects')}</th><th>${t('th_actions')}</th></tr></thead>
+    <tbody>${teachers.map(te => `<tr>
+      <td style="font-weight:600;">${te.name}</td>
+      <td dir="ltr" style="font-size:12px;">${te.tel || '—'}</td>
+      <td>${te.location || '—'}</td>
+      <td style="font-size:12px;">${te.subjects || '—'}</td>
+      <td style="white-space:nowrap;">
+        <button class="btn btn-ghost btn-sm" onclick="openTeacherForm(${te.id})">✏️</button>
+        <button class="btn btn-danger btn-sm" onclick="askDelete('teacher', ${te.id}, '${te.name.replace(/'/g, "\\'")}')">🗑️</button>
+      </td>
+    </tr>`).join('')}</tbody>`;
+}
+
+function openTeacherForm(id) {
+  editingTeacherId = id;
+  const te = id ? teachers.find(x => x.id === id) : null;
+  document.getElementById('teacherFormTitle').textContent = te ? `✏️ ${te.name}` : t('btn_add_teacher');
+  document.getElementById('fTName').value = te ? te.name : '';
+  document.getElementById('fTTel').value = te ? te.tel : '';
+  document.getElementById('fTLoc').value = te ? te.location : '';
+  document.getElementById('fTSubjects').value = te ? te.subjects : '';
+  document.getElementById('teacherFormStatus').textContent = '';
+  openOv('ovTeacher');
+}
+
+async function saveTeacher() {
+  const name = document.getElementById('fTName').value.trim();
+  const status = document.getElementById('teacherFormStatus');
+  if (!name) { status.textContent = '⚠️'; status.style.color = 'var(--red)'; return; }
+  status.textContent = '⏳…'; status.style.color = 'var(--muted)';
+
+  let id = editingTeacherId;
+  if (!id) id = teachers.length ? Math.max(...teachers.map(x => x.id)) + 1 : 1;
+
+  const data = {
+    id, name,
+    tel: document.getElementById('fTTel').value.trim(),
+    location: document.getElementById('fTLoc').value.trim(),
+    subjects: document.getElementById('fTSubjects').value.trim()
+  };
+
+  try {
+    const { doc, setDoc } = window._fs;
+    await setDoc(doc(window._db, 'bq_teachers', String(id)), data);
+    if (editingTeacherId) {
+      teachers[teachers.findIndex(x => x.id === id)] = data;
+    } else {
+      teachers.push(data);
+    }
+    status.textContent = t('saved'); status.style.color = 'var(--green)';
+    renderAdminTeachers(); renderTeachers(); populateGates();
+    setTimeout(() => closeOv('ovTeacher'), 650);
+  } catch(e) {
+    status.textContent = t('error') + e.message; status.style.color = 'var(--red)';
+  }
+}
+
+// ----- Admin: schedule -----
+let editingSlotId = null;
+
+function renderAdminSchedule() {
+  if (!session.admin) return;
+  const sorted = [...schedule].sort((a,b) => DAY_ORDER.indexOf(a.day) - DAY_ORDER.indexOf(b.day) || a.timeSenegal.localeCompare(b.timeSenegal));
+  document.getElementById('adminScheduleTable').innerHTML = `
+    <thead><tr><th>${t('th_day')}</th><th>${t('th_time')}</th><th>${t('th_subject')}</th><th>${t('th_teacher')}</th><th>${t('th_actions')}</th></tr></thead>
+    <tbody>${sorted.map(e => `<tr>
+      <td style="font-weight:600;">${lang === 'fr' ? DAY_FR[e.day] + ' · ' + e.day : e.day}</td>
+      <td style="font-size:12px;white-space:nowrap;">🇸🇳 ${e.timeSenegal}<br>🇪🇬 ${e.timeEgypt}</td>
+      <td>${e.subject}</td>
+      <td style="font-size:12.5px;">${e.teacher || '—'}</td>
+      <td style="white-space:nowrap;">
+        <button class="btn btn-ghost btn-sm" onclick="openSlotForm(${e.id})">✏️</button>
+        <button class="btn btn-danger btn-sm" onclick="askDelete('slot', ${e.id}, '${(e.subject + ' — ' + e.day).replace(/'/g, "\\'")}')">🗑️</button>
+      </td>
+    </tr>`).join('')}</tbody>`;
+}
+
+function openSlotForm(id) {
+  editingSlotId = id;
+  const e = id ? schedule.find(x => x.id === id) : null;
+  document.getElementById('slotFormTitle').textContent = e ? `✏️ ${e.subject}` : t('btn_add_slot');
+  document.getElementById('fDay').value = e ? e.day : 'السبت';
+  document.getElementById('fSubject').value = e ? e.subject : '';
+  document.getElementById('fTimeSn').value = e ? e.timeSenegal : '';
+  document.getElementById('fTimeEg').value = e ? e.timeEgypt : '';
+  const sel = document.getElementById('fSlotTeacher');
+  sel.innerHTML = `<option value="">—</option>` + teachers.map(te => `<option value="${te.name}">${te.name}</option>`).join('');
+  sel.value = e ? e.teacher : '';
+  document.getElementById('slotFormStatus').textContent = '';
+  openOv('ovSlot');
+}
+
+async function saveSlot() {
+  const subject = document.getElementById('fSubject').value.trim();
+  const status = document.getElementById('slotFormStatus');
+  if (!subject) { status.textContent = '⚠️'; status.style.color = 'var(--red)'; return; }
+  status.textContent = '⏳…'; status.style.color = 'var(--muted)';
+
+  let id = editingSlotId;
+  if (!id) id = schedule.length ? Math.max(...schedule.map(x => x.id)) + 1 : 1;
+
+  const data = {
+    id,
+    day: document.getElementById('fDay').value,
+    subject,
+    timeSenegal: document.getElementById('fTimeSn').value.trim(),
+    timeEgypt: document.getElementById('fTimeEg').value.trim(),
+    teacher: document.getElementById('fSlotTeacher').value
+  };
+
+  try {
+    const { doc, setDoc } = window._fs;
+    await setDoc(doc(window._db, 'bq_schedule', String(id)), data);
+    if (editingSlotId) {
+      schedule[schedule.findIndex(x => x.id === id)] = data;
+    } else {
+      schedule.push(data);
+    }
+    status.textContent = t('saved'); status.style.color = 'var(--green)';
+    renderAdminSchedule(); renderSchedule();
+    setTimeout(() => closeOv('ovSlot'), 650);
+  } catch(e) {
+    status.textContent = t('error') + e.message; status.style.color = 'var(--red)';
+  }
+}
+
+// ----- Delete confirm -----
+function askDelete(type, id, name) {
+  document.getElementById('confirmName').textContent = name;
+  confirmAction = { type, id };
+  document.getElementById('confirmBtn').onclick = doDelete;
+  openOv('ovConfirm');
+}
+
+async function doDelete() {
+  if (!confirmAction) return;
+  const { type, id } = confirmAction;
+  const { doc, deleteDoc } = window._fs;
+  try {
+    if (type === 'student') {
+      await deleteDoc(doc(window._db, 'bq_students', String(id)));
+      students = students.filter(s => s.id !== id);
+      renderAdminStudents(); renderStudents();
+    } else if (type === 'teacher') {
+      await deleteDoc(doc(window._db, 'bq_teachers', String(id)));
+      teachers = teachers.filter(x => x.id !== id);
+      renderAdminTeachers(); renderTeachers(); populateGates();
+    } else if (type === 'slot') {
+      await deleteDoc(doc(window._db, 'bq_schedule', String(id)));
+      schedule = schedule.filter(x => x.id !== id);
+      renderAdminSchedule(); renderSchedule();
+    }
+    closeOv('ovConfirm');
+  } catch(e) {
+    alert(t('error') + e.message);
+  }
+}
+
+// ----- Settings -----
+function fillSettingsForm() {
+  document.getElementById('setStudentPw').value = settings.studentPagePassword;
+  document.getElementById('setTeacherPw').value = settings.teacherPassword;
+  document.getElementById('setAdminUser').value = settings.adminUser;
+  document.getElementById('setAdminPw').value = settings.adminPassword;
+  document.getElementById('setRecoveryEmail').value = settings.recoveryEmail;
+  document.getElementById('studPageSwitch').classList.toggle('on', settings.studentPageEnabled);
+}
+
+function toggleStudentPage() {
+  settings.studentPageEnabled = !settings.studentPageEnabled;
+  document.getElementById('studPageSwitch').classList.toggle('on', settings.studentPageEnabled);
+}
+
+async function saveSettings() {
+  const status = document.getElementById('settingsStatus');
+  status.textContent = '⏳…'; status.style.color = 'var(--muted)';
+  settings.studentPagePassword = document.getElementById('setStudentPw').value.trim();
+  settings.teacherPassword = document.getElementById('setTeacherPw').value.trim();
+  settings.adminUser = document.getElementById('setAdminUser').value.trim();
+  settings.adminPassword = document.getElementById('setAdminPw').value.trim();
+  settings.recoveryEmail = document.getElementById('setRecoveryEmail').value.trim();
+  try {
+    const { doc, setDoc } = window._fs;
+    await setDoc(doc(window._db, 'config', 'settings'), settings);
+    status.textContent = t('saved'); status.style.color = 'var(--green)';
+  } catch(e) {
+    status.textContent = t('error') + e.message; status.style.color = 'var(--red)';
+  }
+}
+
+// ================= REPORTS =================
+function studentName(id) {
+  const s = students.find(x => x.id === parseInt(id));
+  return s ? `${fullName(s)}` : `#${id}`;
+}
+
+function exportAttendanceReport() {
+  const wb = XLSX.utils.book_new();
+
+  // Sheet 1: raw records
+  const rows = [];
+  Object.values(attendanceCache).forEach(a => {
+    Object.entries(a.records || {}).forEach(([sid, r]) => {
+      rows.push({
+        'Date': a.date,
+        'Jour / اليوم': a.day,
+        'Matière / المادة': a.subject,
+        'Professeur / الأستاذ': a.teacher,
+        'Étudiant / الطالب': studentName(sid),
+        'Présence / الحضور': r.present === true ? 'Présent / حاضر' : r.present === false ? 'Absent / غائب' : '—',
+        'Commentaire / ملاحظة': r.comment || ''
+      });
+    });
+  });
+  const ws1 = XLSX.utils.json_to_sheet(rows.length ? rows : [{'Info': 'Aucune donnée / لا توجد بيانات'}]);
+  ws1['!cols'] = [{wch:12},{wch:12},{wch:26},{wch:26},{wch:26},{wch:18},{wch:30}];
+  XLSX.utils.book_append_sheet(wb, ws1, 'Émargement détaillé');
+
+  // Sheet 2: stats per student
+  const stats = {};
+  students.forEach(s => stats[s.id] = { name: `${fullName(s)}`, present: 0, absent: 0 });
+  Object.values(attendanceCache).forEach(a => {
+    Object.entries(a.records || {}).forEach(([sid, r]) => {
+      if (!stats[sid]) return;
+      if (r.present === true) stats[sid].present++;
+      if (r.present === false) stats[sid].absent++;
+    });
+  });
+  const statRows = Object.values(stats).map(s => ({
+    'Étudiant / الطالب': s.name,
+    'Présences / حضور': s.present,
+    'Absences / غياب': s.absent,
+    'Taux de présence': (s.present + s.absent) ? Math.round(s.present / (s.present + s.absent) * 100) + '%' : '—'
+  }));
+  const ws2 = XLSX.utils.json_to_sheet(statRows);
+  ws2['!cols'] = [{wch:28},{wch:14},{wch:14},{wch:16}];
+  XLSX.utils.book_append_sheet(wb, ws2, 'Statistiques');
+
+  XLSX.writeFile(wb, `Emargement_BidayatouAlQari_${new Date().toISOString().slice(0,10)}.xlsx`);
+}
+
+function exportGradesReport() {
+  const wb = XLSX.utils.book_new();
+
+  // Sheet 1: raw grades
+  const rows = [];
+  Object.values(gradesCache).forEach(g => {
+    Object.entries(g.notes || {}).forEach(([sid, n]) => {
+      rows.push({
+        'Date': g.date,
+        'Matière / المادة': g.subject,
+        'Évaluation / التقييم': g.label,
+        'Professeur / الأستاذ': g.teacher,
+        'Étudiant / الطالب': studentName(sid),
+        'Note /20': n.note !== null && n.note !== undefined ? n.note : '—',
+        'Commentaire / ملاحظة': n.comment || ''
+      });
+    });
+  });
+  const ws1 = XLSX.utils.json_to_sheet(rows.length ? rows : [{'Info': 'Aucune donnée / لا توجد بيانات'}]);
+  ws1['!cols'] = [{wch:12},{wch:26},{wch:22},{wch:26},{wch:26},{wch:10},{wch:30}];
+  XLSX.utils.book_append_sheet(wb, ws1, 'Notes détaillées');
+
+  // Sheet 2: averages per student
+  const agg = {};
+  Object.values(gradesCache).forEach(g => {
+    Object.entries(g.notes || {}).forEach(([sid, n]) => {
+      if (n.note === null || n.note === undefined) return;
+      if (!agg[sid]) agg[sid] = { total: 0, count: 0, bySubject: {} };
+      agg[sid].total += n.note; agg[sid].count++;
+      if (!agg[sid].bySubject[g.subject]) agg[sid].bySubject[g.subject] = { total: 0, count: 0 };
+      agg[sid].bySubject[g.subject].total += n.note;
+      agg[sid].bySubject[g.subject].count++;
+    });
+  });
+  const avgRows = Object.entries(agg).map(([sid, a]) => ({
+    'Étudiant / الطالب': studentName(sid),
+    'Nb notes': a.count,
+    'Moyenne générale /20': +(a.total / a.count).toFixed(2),
+    'Détail par matière': Object.entries(a.bySubject).map(([sub, x]) => `${sub}: ${(x.total / x.count).toFixed(1)}`).join(' | ')
+  }));
+  const ws2 = XLSX.utils.json_to_sheet(avgRows.length ? avgRows : [{'Info': 'Aucune donnée / لا توجد بيانات'}]);
+  ws2['!cols'] = [{wch:28},{wch:10},{wch:20},{wch:60}];
+  XLSX.utils.book_append_sheet(wb, ws2, 'Moyennes');
+
+  XLSX.writeFile(wb, `Evaluations_BidayatouAlQari_${new Date().toISOString().slice(0,10)}.xlsx`);
+}
+
+// ================= INIT =================
+async function init() {
+  lang = localStorage.getItem('bq_lang') || 'fr';
+  applyI18n();
+  try {
+    await loadAll();
+  } catch(e) {
+    document.getElementById('loadingTxt').textContent = '❌ ' + e.message;
+    return;
+  }
+  populateGates();
+  renderSchedule();
+  renderTeachers();
+  go('home');
+  document.getElementById('loading').classList.add('hidden');
+}
+init();
+</script>
+</body>
+</html>
