@@ -765,6 +765,7 @@ textarea.input { resize: vertical; min-height: 70px; }
       <button class="admin-tab" data-tab="teachers" onclick="adminTab('teachers')" data-i18n="nav_teachers">Professeurs</button>
       <button class="admin-tab" data-tab="schedule" onclick="adminTab('schedule')" data-i18n="nav_schedule">Emploi du temps</button>
       <button class="admin-tab" data-tab="reports" onclick="adminTab('reports')" data-i18n="tab_reports">Rapports</button>
+      <button class="admin-tab" data-tab="import" onclick="adminTab('import')" data-i18n="tab_import">Import Excel</button>
       <button class="admin-tab" data-tab="settings" onclick="adminTab('settings')" data-i18n="tab_settings">Paramètres</button>
     </div>
 
@@ -799,6 +800,15 @@ textarea.input { resize: vertical; min-height: 70px; }
         <h4 data-i18n="report_grades_title">📊 Rapport des évaluations</h4>
         <p style="font-size:13px;color:var(--muted);margin-bottom:14px;" data-i18n="report_grades_desc">Export Excel de toutes les notes saisies par les professeurs, avec moyennes par étudiant et par matière.</p>
         <button class="btn btn-gold" onclick="exportGradesReport()" data-i18n="btn_export_grades">📥 Exporter les évaluations</button>
+      </div>
+    </div>
+
+    <div class="admin-panel" id="admin-import">
+      <div class="settings-card" style="max-width:640px;">
+        <h4 data-i18n="import_title">📤 Importer un fichier Excel</h4>
+        <p style="font-size:13px;color:var(--muted);margin-bottom:16px;" data-i18n="import_desc">Sélectionnez le fichier Excel mis à jour (mêmes onglets : الفصل الدارسي ١ / الطلاب / الأساتذة). Un aperçu des changements sera affiché avant toute application.</p>
+        <input type="file" id="importFile" accept=".xlsx,.xls" class="input" style="padding:8px;" onchange="handleImportFile(event)">
+        <div id="importPreview" style="margin-top:18px;"></div>
       </div>
     </div>
 
@@ -1054,7 +1064,20 @@ const I18N = {
     btn_join: "🎥 Rejoindre la salle",
     btn_leave: "Quitter la salle",
     live_room_generic: "Salle commune",
-    live_room_generic_desc: "Salle libre pour réunions, tutorat ou sessions hors emploi du temps"
+    live_room_generic_desc: "Salle libre pour réunions, tutorat ou sessions hors emploi du temps",
+    tab_import: "Import Excel",
+    import_title: "📤 Importer un fichier Excel",
+    import_desc: "Sélectionnez le fichier Excel mis à jour (mêmes onglets : الفصل الدارسي ١ / الطلاب / الأساتذة). Un aperçu des changements sera affiché avant toute application.",
+    import_reading: "Lecture du fichier…",
+    import_summary_title: "Aperçu des changements",
+    import_students: "Étudiants", import_teachers: "Professeurs", import_schedule: "Emploi du temps",
+    import_added: "ajouté(s)", import_updated: "modifié(s)", import_removed: "supprimé(s)", import_unchanged: "inchangé(s)",
+    import_apply: "✅ Appliquer ces changements à la base de données",
+    import_applying: "⏳ Application en cours…",
+    import_done: "✅ Base de données mise à jour avec succès !",
+    import_error: "❌ Erreur : ",
+    import_error_format: "⚠️ Le fichier ne contient pas les onglets attendus (الفصل الدارسي ١ / الطلاب / الأساتذة).",
+    import_no_changes: "Aucun changement détecté."
   },
   ar: {
     brand: "بداية القارئ",
@@ -1135,12 +1158,31 @@ const I18N = {
     btn_join: "🎥 دخول القاعة",
     btn_leave: "مغادرة القاعة",
     live_room_generic: "القاعة العامة",
-    live_room_generic_desc: "قاعة حرة للاجتماعات أو الدروس الخصوصية أو الجلسات خارج الجدول"
+    live_room_generic_desc: "قاعة حرة للاجتماعات أو الدروس الخصوصية أو الجلسات خارج الجدول",
+    tab_import: "استيراد Excel",
+    import_title: "📤 استيراد ملف Excel",
+    import_desc: "اختر ملف Excel المحدَّث (بنفس الأوراق: الفصل الدارسي ١ / الطلاب / الأساتذة). سيتم عرض ملخص التغييرات قبل التطبيق.",
+    import_reading: "جارٍ قراءة الملف…",
+    import_summary_title: "ملخص التغييرات",
+    import_students: "الطلاب", import_teachers: "الأساتذة", import_schedule: "الجدول الدراسي",
+    import_added: "إضافة", import_updated: "تعديل", import_removed: "حذف", import_unchanged: "بدون تغيير",
+    import_apply: "✅ تطبيق هذه التغييرات على قاعدة البيانات",
+    import_applying: "⏳ جارٍ التطبيق…",
+    import_done: "✅ تم تحديث قاعدة البيانات بنجاح!",
+    import_error: "❌ خطأ: ",
+    import_error_format: "⚠️ الملف لا يحتوي على الأوراق المتوقعة (الفصل الدارسي ١ / الطلاب / الأساتذة).",
+    import_no_changes: "لم يتم رصد أي تغيير."
   }
 };
 
 const DAY_ORDER = ["السبت", "الأحد", "الاثنين", "الثلاثاء", "الأربعاء", "الخميس", "الجمعة"];
 const DAY_FR = {"السبت":"Samedi","الأحد":"Dimanche","الاثنين":"Lundi","الثلاثاء":"Mardi","الأربعاء":"Mercredi","الخميس":"Jeudi","الجمعة":"Vendredi"};
+
+// Nom complet = colonne K (النسب) du fichier Excel ; repli sur Prénom+Nom si absent
+function fullName(s) {
+  if (!s) return '';
+  return (s.nasab && s.nasab.trim()) ? s.nasab.trim() : `${s.prenom} ${s.nom}`;
+}
 
 // ================= STATE =================
 let lang = 'fr';
@@ -1347,7 +1389,7 @@ function renderStudents() {
   gf.value = selG;
 
   let list = students.filter(s => {
-    const full = `${s.prenom} ${s.nom}`.toLowerCase();
+    const full = fullName(s).toLowerCase();
     if (search && !full.includes(search)) return false;
     if (selG && s.groupe !== selG) return false;
     return true;
@@ -1369,7 +1411,7 @@ function renderStudents() {
     <tbody>${list.map(s => `
       <tr>
         <td>${s.id}</td>
-        <td style="font-weight:600;">${s.prenom} ${s.nom}</td>
+        <td style="font-weight:600;">${fullName(s)}</td>
         <td dir="ltr" style="font-size:12px;">${s.tel || '—'}</td>
         <td>${s.niveauArabe || '—'}</td>
         <td>${s.noteTest || '—'}</td>
@@ -1470,7 +1512,7 @@ function loadAttendanceSheet() {
             const comment = rec ? (rec.comment || '') : '';
             return `<tr>
               <td>${s.id}</td>
-              <td style="font-weight:600;">${s.prenom} ${s.nom}</td>
+              <td style="font-weight:600;">${fullName(s)}</td>
               <td>${s.groupe ? `<span class="badge badge-gold">${s.groupe}</span>` : '—'}</td>
               <td>
                 <div class="presence-toggle">
@@ -1593,7 +1635,7 @@ function loadGradesSheet() {
         <tbody>
           ${list.map(s => `<tr>
             <td>${s.id}</td>
-            <td style="font-weight:600;">${s.prenom} ${s.nom}</td>
+            <td style="font-weight:600;">${fullName(s)}</td>
             <td>${s.groupe ? `<span class="badge badge-gold">${s.groupe}</span>` : '—'}</td>
             <td><input type="number" min="0" max="20" step="0.25" class="note-input grade-note" data-sid="${s.id}"></td>
             <td><input class="input grade-comment" data-sid="${s.id}" style="min-width:160px;font-size:12.5px;padding:7px 10px;"></td>
@@ -1699,6 +1741,201 @@ function joinRoom(subjectName) {
   window.open(roomUrl(subjectName), '_blank', 'noopener');
 }
 
+
+// ================= IMPORT EXCEL =================
+let pendingImport = null; // { students, teachers, schedule, diffs }
+
+function excelCell(ws, r, cIdx) {
+  const addr = XLSX.utils.encode_cell({ r, c: cIdx });
+  const cell = ws[addr];
+  return cell ? cell.v : undefined;
+}
+
+function parseImportWorkbook(wb) {
+  const sheetNames = wb.SheetNames;
+  const schedSheetName = sheetNames.find(n => n.includes('الفصل'));
+  const studSheetName = sheetNames.find(n => n === 'الطلاب' || n.includes('الطلاب') || n.includes('الطالب'));
+  const teachSheetName = sheetNames.find(n => n.includes('الأساتذة'));
+
+  if (!schedSheetName || !studSheetName || !teachSheetName) {
+    throw new Error(t('import_error_format'));
+  }
+
+  // ---- SCHEDULE ----
+  const wsSched = wb.Sheets[schedSheetName];
+  const dayCols = {3:'السبت',4:'السبت',5:'الأحد',6:'الاثنين',7:'الاثنين',8:'الثلاثاء',9:'الثلاثاء',10:'الأربعاء',11:'الخميس'};
+  const scheduleOut = [];
+  let eid = 1;
+  for (let i = 3; i < 13; i++) {
+    const tSn = excelCell(wsSched, i, 1);
+    const tEg = excelCell(wsSched, i, 2);
+    if (tSn === undefined || tSn === null || tSn === '') continue;
+    for (const [colStr, day] of Object.entries(dayCols)) {
+      const col = parseInt(colStr);
+      const val = excelCell(wsSched, i, col);
+      if (val === undefined || val === null || val === '') continue;
+      const parts = String(val).trim().split('\n');
+      scheduleOut.push({
+        id: eid,
+        day,
+        timeSenegal: String(tSn).trim().replace(/h/g, ':'),
+        timeEgypt: String(tEg).trim(),
+        subject: parts[0].trim(),
+        teacher: parts[1] ? parts[1].trim() : ''
+      });
+      eid++;
+    }
+  }
+
+  // ---- STUDENTS (header row 0) ----
+  const studRows = XLSX.utils.sheet_to_json(wb.Sheets[studSheetName], { defval: '' });
+  const studentsOut = [];
+  for (const row of studRows) {
+    const prenom = row['الاسم'];
+    if (!prenom) continue;
+    const g = (key) => (row[key] !== undefined && row[key] !== null) ? String(row[key]).trim() : '';
+    studentsOut.push({
+      id: parseInt(row['الترتيب']),
+      prenom: g('الاسم'),
+      nom: g('اللقب'),
+      tel: g("رقم الهاتف (واتساب)").replace(/\n/g, ' / '),
+      niveauArabe: g('اللغة العربية'),
+      noteTest: g('نتيجة الاختبار الكتابي'),
+      appreciation: g('التقدير العام'),
+      derniereSourate: g('آخر سورة محفوظة'),
+      tazkiya: g('التزكية'),
+      nasab: g('النسب'),
+      age: g('العمر'),
+      groupe: g('مجموعة القرآن')
+    });
+  }
+
+  // ---- TEACHERS ----
+  const teachRows = XLSX.utils.sheet_to_json(wb.Sheets[teachSheetName], { header: 1, defval: '' });
+  const teachersOut = [];
+  let tid = 1;
+  for (let i = 1; i < teachRows.length; i++) {
+    const row = teachRows[i];
+    if (!row[0]) continue;
+    teachersOut.push({
+      id: tid,
+      name: String(row[0]).trim(),
+      tel: String(row[1] || '').trim(),
+      location: String(row[2] || '').trim(),
+      subjects: String(row[3] || '').trim()
+    });
+    tid++;
+  }
+
+  return { students: studentsOut, teachers: teachersOut, schedule: scheduleOut };
+}
+
+function diffCollections(oldList, newList, keyField) {
+  const oldMap = {}; oldList.forEach(x => oldMap[x[keyField]] = x);
+  const newMap = {}; newList.forEach(x => newMap[x[keyField]] = x);
+  const oldIds = new Set(oldList.map(x => x[keyField]));
+  const newIds = new Set(newList.map(x => x[keyField]));
+
+  const added = [...newIds].filter(id => !oldIds.has(id));
+  const removed = [...oldIds].filter(id => !newIds.has(id));
+  const common = [...newIds].filter(id => oldIds.has(id));
+  const updated = common.filter(id => JSON.stringify(oldMap[id]) !== JSON.stringify(newMap[id]));
+  const unchanged = common.filter(id => JSON.stringify(oldMap[id]) === JSON.stringify(newMap[id]));
+
+  return { added, removed, updated, unchanged };
+}
+
+async function handleImportFile(ev) {
+  const file = ev.target.files[0];
+  if (!file) return;
+  const preview = document.getElementById('importPreview');
+  preview.innerHTML = `<p style="color:var(--muted);font-size:13px;">⏳ ${t('import_reading')}</p>`;
+
+  try {
+    const buf = await file.arrayBuffer();
+    const wb = XLSX.read(buf, { type: 'array' });
+    const parsed = parseImportWorkbook(wb);
+
+    const dS = diffCollections(students, parsed.students, 'id');
+    const dT = diffCollections(teachers, parsed.teachers, 'id');
+    const dC = diffCollections(schedule, parsed.schedule, 'id');
+
+    pendingImport = { ...parsed, diffs: { students: dS, teachers: dT, schedule: dC } };
+
+    const totalChanges = dS.added.length + dS.removed.length + dS.updated.length
+      + dT.added.length + dT.removed.length + dT.updated.length
+      + dC.added.length + dC.removed.length + dC.updated.length;
+
+    const row = (label, d) => `
+      <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);font-size:13.5px;">
+        <span style="font-weight:600;">${label}</span>
+        <span>
+          <span class="badge badge-green">+${d.added.length} ${t('import_added')}</span>
+          <span class="badge badge-navy">${d.updated.length} ${t('import_updated')}</span>
+          <span class="badge badge-red">-${d.removed.length} ${t('import_removed')}</span>
+          <span class="badge badge-gray">${d.unchanged.length} ${t('import_unchanged')}</span>
+        </span>
+      </div>`;
+
+    if (totalChanges === 0) {
+      preview.innerHTML = `<p style="color:var(--muted);font-size:13px;">${t('import_no_changes')}</p>`;
+      return;
+    }
+
+    preview.innerHTML = `
+      <h4 style="font-size:14px;color:var(--navy-dark);margin-bottom:10px;">${t('import_summary_title')}</h4>
+      ${row(t('import_students'), dS)}
+      ${row(t('import_teachers'), dT)}
+      ${row(t('import_schedule'), dC)}
+      <button class="btn btn-gold" style="width:100%;margin-top:16px;" onclick="applyImport()">${t('import_apply')}</button>
+      <div class="status-msg" id="importStatus"></div>
+    `;
+  } catch(e) {
+    preview.innerHTML = `<p style="color:var(--red);font-size:13px;">${t('import_error')}${e.message}</p>`;
+  }
+}
+
+async function applyImport() {
+  if (!pendingImport) return;
+  const status = document.getElementById('importStatus');
+  status.textContent = t('import_applying');
+  status.style.color = 'var(--muted)';
+
+  try {
+    const { doc, setDoc, deleteDoc } = window._fs;
+
+    // Students
+    for (const s of pendingImport.students) await setDoc(doc(window._db, 'bq_students', String(s.id)), s);
+    for (const id of pendingImport.diffs.students.removed) await deleteDoc(doc(window._db, 'bq_students', String(id)));
+
+    // Teachers
+    for (const te of pendingImport.teachers) await setDoc(doc(window._db, 'bq_teachers', String(te.id)), te);
+    for (const id of pendingImport.diffs.teachers.removed) await deleteDoc(doc(window._db, 'bq_teachers', String(id)));
+
+    // Schedule
+    for (const sl of pendingImport.schedule) await setDoc(doc(window._db, 'bq_schedule', String(sl.id)), sl);
+    for (const id of pendingImport.diffs.schedule.removed) await deleteDoc(doc(window._db, 'bq_schedule', String(id)));
+
+    // Update local state
+    students = [...pendingImport.students];
+    teachers = [...pendingImport.teachers];
+    schedule = [...pendingImport.schedule];
+
+    // Refresh all views
+    populateFilters(); populateGates();
+    renderStudents(); renderTeachers(); renderSchedule();
+    renderAdminStudents(); renderAdminTeachers(); renderAdminSchedule();
+
+    status.textContent = t('import_done');
+    status.style.color = 'var(--green)';
+    pendingImport = null;
+    document.getElementById('importFile').value = '';
+  } catch(e) {
+    status.textContent = t('import_error') + e.message;
+    status.style.color = 'var(--red)';
+  }
+}
+
 // ================= ADMIN =================
 function unlockAdmin() {
   const user = document.getElementById('adminUser').value.trim();
@@ -1738,13 +1975,13 @@ function renderAdminStudents() {
     <thead><tr><th>${t('th_order')}</th><th>${t('th_name')}</th><th>${t('th_tel')}</th><th>${t('th_groupe')}</th><th>${t('th_apprec')}</th><th>${t('th_actions')}</th></tr></thead>
     <tbody>${students.map(s => `<tr>
       <td>${s.id}</td>
-      <td style="font-weight:600;">${s.prenom} ${s.nom}</td>
+      <td style="font-weight:600;">${fullName(s)}</td>
       <td dir="ltr" style="font-size:12px;">${s.tel || '—'}</td>
       <td>${s.groupe || '—'}</td>
       <td>${s.appreciation || '—'}</td>
       <td style="white-space:nowrap;">
         <button class="btn btn-ghost btn-sm" onclick="openStudentForm(${s.id})">✏️</button>
-        <button class="btn btn-danger btn-sm" onclick="askDelete('student', ${s.id}, '${(s.prenom + ' ' + s.nom).replace(/'/g, "\\'")}')">🗑️</button>
+        <button class="btn btn-danger btn-sm" onclick="askDelete('student', ${s.id}, '${fullName(s).replace(/'/g, "\\'")}')">🗑️</button>
       </td>
     </tr>`).join('')}</tbody>`;
 }
@@ -1752,7 +1989,7 @@ function renderAdminStudents() {
 function openStudentForm(id) {
   editingStudentId = id;
   const s = id ? students.find(x => x.id === id) : null;
-  document.getElementById('studentFormTitle').textContent = s ? `✏️ ${s.prenom} ${s.nom}` : t('btn_add_student');
+  document.getElementById('studentFormTitle').textContent = s ? `✏️ ${fullName(s)}` : t('btn_add_student');
   document.getElementById('fPrenom').value = s ? s.prenom : '';
   document.getElementById('fNom').value = s ? s.nom : '';
   document.getElementById('fTel').value = s ? s.tel : '';
@@ -2006,7 +2243,7 @@ async function saveSettings() {
 // ================= REPORTS =================
 function studentName(id) {
   const s = students.find(x => x.id === parseInt(id));
-  return s ? `${s.prenom} ${s.nom}` : `#${id}`;
+  return s ? `${fullName(s)}` : `#${id}`;
 }
 
 function exportAttendanceReport() {
@@ -2033,7 +2270,7 @@ function exportAttendanceReport() {
 
   // Sheet 2: stats per student
   const stats = {};
-  students.forEach(s => stats[s.id] = { name: `${s.prenom} ${s.nom}`, present: 0, absent: 0 });
+  students.forEach(s => stats[s.id] = { name: `${fullName(s)}`, present: 0, absent: 0 });
   Object.values(attendanceCache).forEach(a => {
     Object.entries(a.records || {}).forEach(([sid, r]) => {
       if (!stats[sid]) return;
